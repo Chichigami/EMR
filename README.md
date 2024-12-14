@@ -4,7 +4,11 @@ An electronic medical record web app
 
 ## Goals
 
-Make a blazingly fast web app with Go.
+Make a blazingly fast back and front end with Go and Gin
+
+## Dependancies
+
+Gin
 
 ## Features planned
 
