@@ -29,7 +29,7 @@ func main() {
 		patient.POST("", handlerPatientNew)          //add new patient
 		patient.GET("/:ID", handlerPatient)          //show patient based on ID
 		patient.PUT("/:ID", handlerPatientUpdate)    //update patient info
-		patient.DELETE("/:ID", handlerPatientDelete) //delete existing patient
+		patient.DELETE("/:ID", handlerPatientDelete) //delete existing patient, need admin perm
 		//patient.GET("/:ID", handlerPatientQuery)     //query for patient based on patient id, name, dob
 	}
 
@@ -41,5 +41,10 @@ func main() {
 		charts.DELETE("/:ID", handlerChartDelete) //delete chart
 	}
 
+	schedule := r.Group("/schedule")
+	{
+		schedule.POST("/:ID", handlerScheduleNew)      //schedule a patient
+		schedule.DELETE("/:ID", handlerScheduleDelete) //delete a patient's appointment
+	}
 	r.Run(":8000")
 }

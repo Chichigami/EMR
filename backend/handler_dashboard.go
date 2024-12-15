@@ -16,3 +16,6 @@ func handlerDashboardNotToday(c *gin.Context) {
 	//run this when date != today
 	handlerPlaceholder(c)
 }
+
+type dashboard struct {
+}
