@@ -11,6 +11,8 @@ func handlerLogin(c *gin.Context) {
 	//GET a req with user, password, server
 	//validate user, pass, server
 	//response
+	//on success redirect
+	//on failure show error message
 	handlerPlaceholder(c)
 }
 

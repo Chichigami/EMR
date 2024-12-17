@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <script src="/internal/htmx.min.js"></script>
+    <link href="/index.css" rel="stylesheet">
+<body>
+    <nav class="navbar">
+        <a class="logo">EMR</a>
+    </nav>
+</body>
+
+<body id="container">
+
+    <h3>Login</h3>
+    <form hx-get="/login">
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" class="form-control" name="username">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="text" class="form-control" name="password">
+      </div>
+      <button class="btn primary">Login</button>
+    </form>
+
+</body>
+</html>

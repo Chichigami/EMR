@@ -48,3 +48,7 @@ func main() {
 	}
 	r.Run(":8000")
 }
+
+type config struct {
+	db string
+}
