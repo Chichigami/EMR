@@ -13,7 +13,7 @@
 
   <div id="login">
     <h3>Login</h3>
-    <form hx-get="/login">
+    <form hx-post="/login" method="POST">
 
       <div class="form-group">
         <label>Username</label>
@@ -22,7 +22,7 @@
 
       <div class="form-group">
         <label>Password</label>
-        <input type="text" class="form-control" name="password">
+        <input type="password" class="form-control" name="password">
       </div>
 
       <button class="btn primary">Login</button>

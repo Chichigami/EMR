@@ -25,7 +25,8 @@ body {
     text-align: leftr;
 }
 
-input[type="text"] {
+input[type="text"],
+input[type="password"]:focus {
     background-color: #F5F5F5; 
     color: #363434; 
     border: 1px solid #696969; 
@@ -36,11 +37,13 @@ input[type="text"] {
     font-size: 1em;
 }
 
-input[type="text"]:focus {
+input[type="text"]
+input[type="password"]:focus {
     outline: none; 
     border-color: #4CAF50; 
     box-shadow: 0 0 5px rgba(76, 175, 80, 0.6);
 }
+
 
 button {
     background-color: #4CAF50;
