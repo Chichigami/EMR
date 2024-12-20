@@ -1,6 +1,10 @@
 package main
 
-import "github.com/gin-gonic/gin"
+import (
+	"fmt"
+
+	"github.com/gin-gonic/gin"
+)
 
 func handlerLoginNew(c *gin.Context) {
 	//make new login, admin perm
@@ -13,6 +17,10 @@ func handlerLogin(c *gin.Context) {
 	//response
 	//on success redirect
 	//on failure show error message
+
+	username := c.Request.FormValue("username")
+	password := c.Request.FormValue("password")
+	fmt.Printf("username: %s, password: %s\n", username, password)
 	handlerPlaceholder(c)
 }
 

@@ -1,6 +1,8 @@
 package main
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -8,6 +10,12 @@ func main() {
 	//connect to DB
 
 	router := gin.Default() //default page should be login page
+	router.Static("/static", "../frontend")
+	router.LoadHTMLFiles("../frontend/login.html", "../frontend/dashboard.html")
+
+	router.GET("/", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "login.html", gin.H{})
+	})
 	router.Delims("{[{", "}]}")
 
 	router.GET("/ping", handlerPlaceholder)
@@ -50,6 +58,6 @@ func main() {
 	router.Run(":8000")
 }
 
-type config struct {
-	db string
-}
+// type config struct {
+// 	db string
+// }

@@ -17,11 +17,11 @@ func handlerPatientDelete(c *gin.Context) {
 	handlerPlaceholder(c)
 }
 
-func handlerPatientQuery(c *gin.Context) {
-	//client is unsure who patient is. query via id, name, dob
-	//call handlerPatient after
-	handlerPlaceholder(c)
-}
+// func handlerPatientQuery(c *gin.Context) {
+// 	//client is unsure who patient is. query via id, name, dob
+// 	//call handlerPatient after
+// 	handlerPlaceholder(c)
+// }
 
 func handlerPatientUpdate(c *gin.Context) {
 	handlerPlaceholder(c)

@@ -2,10 +2,10 @@ package main
 
 import "github.com/gin-gonic/gin"
 
-func handlerDashboard(c *gin.Context) {
-	//if date = today, grab cached dashboard
-	handlerPlaceholder(c)
-}
+// func handlerDashboard(c *gin.Context) {
+// 	//if date = today, grab cached dashboard
+// 	handlerPlaceholder(c)
+// }
 
 func handlerDashboardToday(c *gin.Context) {
 	//run this before work day starts
@@ -17,5 +17,5 @@ func handlerDashboardNotToday(c *gin.Context) {
 	handlerPlaceholder(c)
 }
 
-type dashboard struct {
-}
+// type dashboard struct {
+// }
