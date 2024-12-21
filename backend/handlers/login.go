@@ -1,8 +1,9 @@
 package main
 
 import (
-	"fmt"
+	"net/http"
 
+	"github.com/chichigami/EMR/internal/auth"
 	"github.com/gin-gonic/gin"
 )
 
@@ -11,16 +12,18 @@ func handlerLoginNew(c *gin.Context) {
 	handlerPlaceholder(c)
 }
 
-func handlerLogin(c *gin.Context) {
-	//GET a req with user, password, server
-	//validate user, pass, server
-	//response
-	//on success redirect
-	//on failure show error message
-
-	username := c.Request.FormValue("username")
-	password := c.Request.FormValue("password")
-	fmt.Printf("username: %s, password: %s\n", username, password)
+func handlerLoginVerify(c *gin.Context) {
+	//from POST req
+	password := "get password from req"
+	if hashed, ok := auth.HashPassword(password); ok == nil {
+		if success := auth.CheckPasswordHash(hashed, password); success == nil {
+			//give auth cookie
+			c.JSON(http.StatusOK, gin.H{
+				"success": true,
+				"message": "Login successful",
+			})
+		}
+	}
 	handlerPlaceholder(c)
 }
 

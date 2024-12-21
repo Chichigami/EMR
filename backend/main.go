@@ -1,13 +1,31 @@
 package main
 
 import (
+	"database/sql"
+	"log"
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
+	_ "github.com/lib/pq"
 )
 
 func main() {
-	//connect to DB
+	godotenv.Load("../.env")
+	dbURL := os.Getenv("DB_URL")
+	if dbURL == "" {
+		log.Fatal("DB_URL must be set")
+	}
+	dbConnection, err := sql.Open("postgres", dbURL)
+	if err != nil {
+		log.Fatalf("Error opening database: %s", err)
+	}
+	dbQueries := database.New(dbConnection)
+
+	cfg := config{
+		db: dbQueries,
+	}
 
 	router := gin.Default() //default page should be login page
 	router.Static("/static", "../frontend")
@@ -22,8 +40,8 @@ func main() {
 
 	login := router.Group("/login")
 	{
-		login.POST("", handlerLoginNew)      //new login, need admin priv
-		login.GET("", handlerLogin)          //wait for login info, verifies
+		login.POST("", handlerLoginVerify)   //wait for login info, verifies
+		login.GET("", handlerLoginNew)       //
 		login.PUT("", handlerLoginUpdate)    //update login
 		login.DELETE("", handlerLoginDelete) //delete login, need admin priv
 	}
@@ -58,6 +76,6 @@ func main() {
 	router.Run(":8000")
 }
 
-// type config struct {
-// 	db string
-// }
+type config struct {
+	db *database.Queries
+}

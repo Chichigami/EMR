@@ -13,7 +13,7 @@
 
   <div id="login">
     <h3>Login</h3>
-    <form hx-post="/login" method="POST">
+    <form id="login-form" hx-post="/login" method="POST" hx-headers='{Content-Type: "application/json"}'>
 
       <div class="form-group">
         <label>Username</label>
