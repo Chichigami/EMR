@@ -6,13 +6,16 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/chichigami/EMR/internal/database"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
 
 func main() {
-	godotenv.Load("../.env")
+	if err := godotenv.Load("../.env"); err != nil {
+		log.Fatalf("Error loading .env file")
+	}
 	dbURL := os.Getenv("DB_URL")
 	if dbURL == "" {
 		log.Fatal("DB_URL must be set")
@@ -21,9 +24,14 @@ func main() {
 	if err != nil {
 		log.Fatalf("Error opening database: %s", err)
 	}
+	if err := dbConnection.Ping(); err != nil {
+		log.Fatalf("Error pinging database: %s", err)
+	}
+	defer dbConnection.Close()
+
 	dbQueries := database.New(dbConnection)
 
-	cfg := config{
+	cfg := Config{
 		db: dbQueries,
 	}
 
@@ -40,42 +48,42 @@ func main() {
 
 	login := router.Group("/login")
 	{
-		login.POST("", handlerLoginVerify)   //wait for login info, verifies
-		login.GET("", handlerLoginNew)       //
-		login.PUT("", handlerLoginUpdate)    //update login
-		login.DELETE("", handlerLoginDelete) //delete login, need admin priv
+		login.POST("", cfg.handlerUsersVerify)   //wait for login info, verifies
+		login.GET("", cfg.handlerUsersNew)       //
+		login.PUT("", cfg.handlerUsersUpdate)    //update login
+		login.DELETE("", cfg.handlerUsersDelete) //delete login, need admin priv
 	}
 	dashboard := router.Group("/dashboard") //might just make it one handler. cache date in server. if date is today then grab cache?
 	{
-		dashboard.GET("", handlerDashboardToday)          //show today's dashboard
-		dashboard.GET("/:date", handlerDashboardNotToday) //show some date's dashboard (maybe yesterday)
+		dashboard.GET("", cfg.handlerDashboardToday)          //show today's dashboard
+		dashboard.GET("/:date", cfg.handlerDashboardNotToday) //show some date's dashboard (maybe yesterday)
 	}
 
 	patient := router.Group("/patients")
 	{
-		patient.POST("", handlerPatientNew)          //add new patient
-		patient.GET("/:ID", handlerPatient)          //show patient based on ID
-		patient.PUT("/:ID", handlerPatientUpdate)    //update patient info
-		patient.DELETE("/:ID", handlerPatientDelete) //delete existing patient, need admin perm
+		patient.POST("", cfg.handlerPatientsNew)          //add new patient
+		patient.GET("/:ID", cfg.handlerPatients)          //show patient based on ID
+		patient.PUT("/:ID", cfg.handlerPatientsUpdate)    //update patient info
+		patient.DELETE("/:ID", cfg.handlerPatientsDelete) //delete existing patient, need admin perm
 		//patient.GET("/:ID", handlerPatientQuery)     //query for patient based on patient id, name, dob
 	}
 
 	charts := router.Group("/patients/charts")
 	{
-		charts.POST("/:ID", handlerChartNew)      //make new chart for patient
-		charts.GET("/:ID", handlerChart)          //show chart info
-		charts.PUT("/:ID", handlerChartUpdate)    //update chart
-		charts.DELETE("/:ID", handlerChartDelete) //delete chart
+		charts.POST("/:ID", cfg.handlerChartsNew)      //make new chart for patient
+		charts.GET("/:ID", cfg.handlerCharts)          //show chart info
+		charts.PUT("/:ID", cfg.handlerChartsUpdate)    //update chart
+		charts.DELETE("/:ID", cfg.handlerChartsDelete) //delete chart
 	}
 
 	schedule := router.Group("/schedule")
 	{
-		schedule.POST("/:ID", handlerScheduleNew)      //schedule a patient
-		schedule.DELETE("/:ID", handlerScheduleDelete) //delete a patient's appointment
+		schedule.POST("/:ID", cfg.handlerAppointmentsNew)      //schedule a patient
+		schedule.DELETE("/:ID", cfg.handlerAppointmentsDelete) //delete a patient's appointment
 	}
 	router.Run(":8000")
 }
 
-type config struct {
+type Config struct {
 	db *database.Queries
 }

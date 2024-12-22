@@ -7,12 +7,12 @@ import "github.com/gin-gonic/gin"
 // 	handlerPlaceholder(c)
 // }
 
-func handlerDashboardToday(c *gin.Context) {
+func (cfg *Config) handlerDashboardToday(c *gin.Context) {
 	//run this before work day starts
 	handlerPlaceholder(c)
 }
 
-func handlerDashboardNotToday(c *gin.Context) {
+func (cfg *Config) handlerDashboardNotToday(c *gin.Context) {
 	//run this when date != today
 	handlerPlaceholder(c)
 }

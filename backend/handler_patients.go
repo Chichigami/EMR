@@ -1,18 +1,20 @@
 package main
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+)
 
-func handlerPatient(c *gin.Context) {
+func (cfg *Config) handlerPatients(c *gin.Context) {
 	//get patient info
 	handlerPlaceholder(c)
 }
 
-func handlerPatientNew(c *gin.Context) {
+func (cfg *Config) handlerPatientsNew(c *gin.Context) {
 	//make new patient into db
 	handlerPlaceholder(c)
 }
 
-func handlerPatientDelete(c *gin.Context) {
+func (cfg *Config) handlerPatientsDelete(c *gin.Context) {
 	//delete patient from db
 	handlerPlaceholder(c)
 }
@@ -23,6 +25,6 @@ func handlerPatientDelete(c *gin.Context) {
 // 	handlerPlaceholder(c)
 // }
 
-func handlerPatientUpdate(c *gin.Context) {
+func (cfg *Config) handlerPatientsUpdate(c *gin.Context) {
 	handlerPlaceholder(c)
 }
