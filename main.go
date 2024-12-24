@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 
+	_ "github.com/a-h/templ"
 	"github.com/chichigami/EMR/internal/database"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
