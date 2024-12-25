@@ -17,15 +17,15 @@ INSERT INTO patients (
     date_of_birth, sex, social_security_number, 
     pharmacy, email, location_address, zip_code, 
     cell_phone_number, home_phone_number, 
-    marital_status, chart_id, primary_care_doctor)
+    marital_status, primary_care_doctor)
 VALUES(
     $1, $2, $3,
     $4, $5, $6,
     $7, $8, $9, $10,
     $11, $12,
-    $13, $14, $15
+    $13, $14
 )
-RETURNING id, created_at, updated_at, last_name, first_name, middle_name, date_of_birth, sex, social_security_number, pharmacy, email, location_address, zip_code, cell_phone_number, home_phone_number, marital_status, chart_id, primary_care_doctor
+RETURNING id, created_at, updated_at, last_name, first_name, middle_name, date_of_birth, sex, gender, social_security_number, pharmacy, email, location_address, zip_code, cell_phone_number, home_phone_number, marital_status, chart_id, insurance, primary_care_doctor, extra_note
 `
 
 type CreatePatientParams struct {
@@ -35,14 +35,13 @@ type CreatePatientParams struct {
 	DateOfBirth          time.Time
 	Sex                  string
 	SocialSecurityNumber sql.NullString
-	Pharmacy             sql.NullString
+	Pharmacy             string
 	Email                sql.NullString
 	LocationAddress      string
 	ZipCode              string
 	CellPhoneNumber      sql.NullString
 	HomePhoneNumber      sql.NullString
 	MaritalStatus        sql.NullString
-	ChartID              sql.NullInt32
 	PrimaryCareDoctor    sql.NullString
 }
 
@@ -61,7 +60,6 @@ func (q *Queries) CreatePatient(ctx context.Context, arg CreatePatientParams) (P
 		arg.CellPhoneNumber,
 		arg.HomePhoneNumber,
 		arg.MaritalStatus,
-		arg.ChartID,
 		arg.PrimaryCareDoctor,
 	)
 	var i Patient
@@ -74,6 +72,7 @@ func (q *Queries) CreatePatient(ctx context.Context, arg CreatePatientParams) (P
 		&i.MiddleName,
 		&i.DateOfBirth,
 		&i.Sex,
+		&i.Gender,
 		&i.SocialSecurityNumber,
 		&i.Pharmacy,
 		&i.Email,
@@ -83,7 +82,9 @@ func (q *Queries) CreatePatient(ctx context.Context, arg CreatePatientParams) (P
 		&i.HomePhoneNumber,
 		&i.MaritalStatus,
 		&i.ChartID,
+		&i.Insurance,
 		&i.PrimaryCareDoctor,
+		&i.ExtraNote,
 	)
 	return i, err
 }
@@ -98,55 +99,37 @@ func (q *Queries) DeletePatient(ctx context.Context, chartID sql.NullInt32) erro
 	return err
 }
 
-const getPatient = `-- name: GetPatient :many
-SELECT id, created_at, updated_at, last_name, first_name, middle_name, date_of_birth, sex, social_security_number, pharmacy, email, location_address, zip_code, cell_phone_number, home_phone_number, marital_status, chart_id, primary_care_doctor
+const getPatient = `-- name: GetPatient :one
+SELECT id, created_at, updated_at, last_name, first_name, middle_name, date_of_birth, sex, gender, social_security_number, pharmacy, email, location_address, zip_code, cell_phone_number, home_phone_number, marital_status, chart_id, insurance, primary_care_doctor, extra_note
 FROM patients
-WHERE chart_id = $1 OR date_of_birth = $1 OR last_name = $1 AND first_name = $2
+WHERE chart_id = $1
 `
 
-type GetPatientParams struct {
-	ChartID   sql.NullInt32
-	FirstName string
-}
-
-func (q *Queries) GetPatient(ctx context.Context, arg GetPatientParams) ([]Patient, error) {
-	rows, err := q.db.QueryContext(ctx, getPatient, arg.ChartID, arg.FirstName)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []Patient
-	for rows.Next() {
-		var i Patient
-		if err := rows.Scan(
-			&i.ID,
-			&i.CreatedAt,
-			&i.UpdatedAt,
-			&i.LastName,
-			&i.FirstName,
-			&i.MiddleName,
-			&i.DateOfBirth,
-			&i.Sex,
-			&i.SocialSecurityNumber,
-			&i.Pharmacy,
-			&i.Email,
-			&i.LocationAddress,
-			&i.ZipCode,
-			&i.CellPhoneNumber,
-			&i.HomePhoneNumber,
-			&i.MaritalStatus,
-			&i.ChartID,
-			&i.PrimaryCareDoctor,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
+func (q *Queries) GetPatient(ctx context.Context, chartID sql.NullInt32) (Patient, error) {
+	row := q.db.QueryRowContext(ctx, getPatient, chartID)
+	var i Patient
+	err := row.Scan(
+		&i.ID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.LastName,
+		&i.FirstName,
+		&i.MiddleName,
+		&i.DateOfBirth,
+		&i.Sex,
+		&i.Gender,
+		&i.SocialSecurityNumber,
+		&i.Pharmacy,
+		&i.Email,
+		&i.LocationAddress,
+		&i.ZipCode,
+		&i.CellPhoneNumber,
+		&i.HomePhoneNumber,
+		&i.MaritalStatus,
+		&i.ChartID,
+		&i.Insurance,
+		&i.PrimaryCareDoctor,
+		&i.ExtraNote,
+	)
+	return i, err
 }

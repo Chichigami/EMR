@@ -14,7 +14,7 @@ import (
 )
 
 func main() {
-	if err := godotenv.Load("../.env"); err != nil {
+	if err := godotenv.Load(".env"); err != nil {
 		log.Fatalf("Error loading .env file")
 	}
 	dbURL := os.Getenv("DB_URL")
@@ -43,14 +43,17 @@ func main() {
 	router.GET("/", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "login.html", gin.H{})
 	})
+	router.GET("/patient/new", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "patient_form.html", gin.H{})
+	})
 	router.Delims("{[{", "}]}")
 
 	router.GET("/ping", handlerPlaceholder)
 
 	login := router.Group("/login")
 	{
-		login.POST("", cfg.handlerUsersVerify)   //wait for login info, verifies
-		login.GET("", cfg.handlerUsersNew)       //
+		login.POST("", cfg.handlerUsersRead)     //wait for login info, verifies
+		login.GET("", cfg.handlerUsersCreate)    //
 		login.PUT("", cfg.handlerUsersUpdate)    //update login
 		login.DELETE("", cfg.handlerUsersDelete) //delete login, need admin priv
 	}
@@ -62,7 +65,7 @@ func main() {
 
 	patient := router.Group("/patients")
 	{
-		patient.POST("", cfg.handlerPatientsNew)          //add new patient
+		patient.POST("/new", cfg.handlerPatientsCreate)   //add new patient
 		patient.GET("/:ID", cfg.handlerPatients)          //show patient based on ID
 		patient.PUT("/:ID", cfg.handlerPatientsUpdate)    //update patient info
 		patient.DELETE("/:ID", cfg.handlerPatientsDelete) //delete existing patient, need admin perm
@@ -71,15 +74,15 @@ func main() {
 
 	charts := router.Group("/patients/charts")
 	{
-		charts.POST("/:ID", cfg.handlerChartsNew)      //make new chart for patient
-		charts.GET("/:ID", cfg.handlerCharts)          //show chart info
+		charts.POST("/:ID", cfg.handlerChartsCreate)   //make new chart for patient
+		charts.GET("/:ID", cfg.handlerChartsRead)      //show chart info
 		charts.PUT("/:ID", cfg.handlerChartsUpdate)    //update chart
 		charts.DELETE("/:ID", cfg.handlerChartsDelete) //delete chart
 	}
 
 	schedule := router.Group("/schedule")
 	{
-		schedule.POST("/:ID", cfg.handlerAppointmentsNew)      //schedule a patient
+		schedule.POST("/:ID", cfg.handlerAppointmentsCreate)   //schedule a patient
 		schedule.DELETE("/:ID", cfg.handlerAppointmentsDelete) //delete a patient's appointment
 	}
 	router.Run(":8000")

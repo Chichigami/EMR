@@ -29,8 +29,9 @@ type Patient struct {
 	MiddleName           sql.NullString
 	DateOfBirth          time.Time
 	Sex                  string
+	Gender               string
 	SocialSecurityNumber sql.NullString
-	Pharmacy             sql.NullString
+	Pharmacy             string
 	Email                sql.NullString
 	LocationAddress      string
 	ZipCode              string
@@ -38,7 +39,9 @@ type Patient struct {
 	HomePhoneNumber      sql.NullString
 	MaritalStatus        sql.NullString
 	ChartID              sql.NullInt32
+	Insurance            sql.NullString
 	PrimaryCareDoctor    sql.NullString
+	ExtraNote            sql.NullString
 }
 
 type User struct {

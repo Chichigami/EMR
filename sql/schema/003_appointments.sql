@@ -9,4 +9,4 @@ CREATE TABLE appointments (
 );
 
 -- +goose Down
-DELETE TABLE IF EXISTS appointments;
+DROP TABLE IF EXISTS appointments;

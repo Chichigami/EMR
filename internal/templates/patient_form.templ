@@ -1,0 +1,39 @@
+package components
+
+import "github.com/chichigami/EMR/internal/models"
+
+func (p *models.Patient) validateForm() map[string]string {
+	errors := make(map[string]string)
+	if len(p.LastName) == 0 {
+		errors["lname"] = "Please Fill in patient's last name"
+	}
+	if len(p.FirstName) == 0 {
+		errors["fname"] = "Please fill in patient's first name"
+	}
+	if len(p.DateOfBirth) == 0 {
+		errors["DoB"] = "Please fill in a date of birth"
+	}
+	if len(p.Sex) == 0 {
+		errors["sex"] = "Please fill in sex"
+	}
+	if p.Sex == "Other" || p.Sex == "O" {
+		errors["extranotes"] = "Please ask patient what organs they have"
+	}
+	if len(p.Gender) == 0 {
+		errors["geneder"] = "Please fill in gender"
+	}
+	if len(p.LocationAddress) == 0 {
+		errors["address"] = "Please fill in address"
+	}
+	if len(p.ZipCode) == 0 {
+		errors["zipcode"] = "Please fill in zip code"
+	}
+	if len(p.CellPhoneNumber) == 0 && len(p.HomePhoneNumber) == 0 {
+		errors["phonenumber"] = "Please fill in one phone number"
+	}
+	return errors
+}
+
+templ createPatientForm(values models.Patient, errors map[string]string) {
+	<form hx-post="/patients/create" class="" id="createPatientForm" hx-encoding="json"></form>
+}

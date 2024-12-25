@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (cfg *Config) handlerUsersNew(c *gin.Context) {
+func (cfg *Config) handlerUsersCreate(c *gin.Context) {
 	//check auth, if not admin, then return error
 	//from a form
 	//hash password
@@ -28,7 +28,7 @@ func (cfg *Config) handlerUsersNew(c *gin.Context) {
 	})
 }
 
-func (cfg *Config) handlerUsersVerify(c *gin.Context) {
+func (cfg *Config) handlerUsersRead(c *gin.Context) {
 	//get info from form
 	//hash the password
 	//get password from db using username

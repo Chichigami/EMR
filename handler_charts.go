@@ -2,12 +2,12 @@ package main
 
 import "github.com/gin-gonic/gin"
 
-func (cfg *Config) handlerChartsNew(c *gin.Context) {
+func (cfg *Config) handlerChartsCreate(c *gin.Context) {
 	//wait for request from front end. make new chart.
 	handlerPlaceholder(c)
 }
 
-func (cfg *Config) handlerCharts(c *gin.Context) {
+func (cfg *Config) handlerChartsRead(c *gin.Context) {
 	//get chart based on ID
 	handlerPlaceholder(c)
 }

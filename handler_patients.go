@@ -5,11 +5,10 @@ import (
 )
 
 func (cfg *Config) handlerPatients(c *gin.Context) {
-	//get patient info
 	handlerPlaceholder(c)
 }
 
-func (cfg *Config) handlerPatientsNew(c *gin.Context) {
+func (cfg *Config) handlerPatientsCreate(c *gin.Context) {
 	//make new patient into db
 	handlerPlaceholder(c)
 }
