@@ -1,4 +1,4 @@
-package main
+package handlers
 
 import "github.com/gin-gonic/gin"
 
@@ -7,14 +7,14 @@ import "github.com/gin-gonic/gin"
 // 	handlerPlaceholder(c)
 // }
 
-func (cfg *Config) handlerDashboardToday(c *gin.Context) {
+func (cfg *HandlerConfig) HandlerDashboardToday(c *gin.Context) {
 	//run this before work day starts
-	handlerPlaceholder(c)
+	HandlerPlaceholder(c)
 }
 
-func (cfg *Config) handlerDashboardNotToday(c *gin.Context) {
+func (cfg *HandlerConfig) HandlerDashboardNotToday(c *gin.Context) {
 	//run this when date != today
-	handlerPlaceholder(c)
+	HandlerPlaceholder(c)
 }
 
 // type dashboard struct {

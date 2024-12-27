@@ -1,4 +1,4 @@
-package main
+package handlers
 
 import (
 	"fmt"
@@ -11,7 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (cfg *Config) handlerUsersCreate(c *gin.Context) {
+func (h *HandlerConfig) HandlerUsersCreate(c *gin.Context) {
 	//check auth, if not admin, then return error
 	//from a form
 	//hash password
@@ -22,7 +22,7 @@ func (cfg *Config) handlerUsersCreate(c *gin.Context) {
 		FirstName:      "",
 		Permissions:    "",
 	}
-	_, err := cfg.db.CreateUser(c.Request.Context(), account)
+	_, err := h.Config.Datebase.CreateUser(c.Request.Context(), account)
 	if err != nil {
 		log.Fatalf("User creation failed: %s", err.Error())
 	}
@@ -31,7 +31,10 @@ func (cfg *Config) handlerUsersCreate(c *gin.Context) {
 	})
 }
 
-func (cfg *Config) handlerUsersRead(c *gin.Context) {
+// receives a http POST request and verifies login
+//
+// gives auth token
+func (h *HandlerConfig) HandlerUsersRead(c *gin.Context) {
 	param := models.UserLogin{}
 	if err := c.ShouldBindJSON(&param); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -56,17 +59,17 @@ func (cfg *Config) handlerUsersRead(c *gin.Context) {
 	c.Header("HX-Redirect", "/dashboard")
 }
 
-func (cfg *Config) handlerUsersUpdate(c *gin.Context) {
+func (h *HandlerConfig) HandlerUsersUpdate(c *gin.Context) {
 	//check if auth matches auth in db or is admin
 	//update password if either
-	handlerPlaceholder(c)
+	HandlerPlaceholder(c)
 }
 
-func (cfg *Config) handlerUsersDelete(c *gin.Context) {
+func (h *HandlerConfig) HandlerUsersDelete(c *gin.Context) {
 	//check if auth is admin
 	//if not then return error
 	//delete user
-	handlerPlaceholder(c)
+	HandlerPlaceholder(c)
 }
 
 //c.Redirect(http.StatusMovedPermanently, "http://www.google.com/")
