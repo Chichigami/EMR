@@ -1,10 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
+	"github.com/chichigami/EMR/internal/auth"
 	"github.com/chichigami/EMR/internal/database"
+	"github.com/chichigami/EMR/internal/models"
 	"github.com/gin-gonic/gin"
 )
 
@@ -29,11 +32,28 @@ func (cfg *Config) handlerUsersCreate(c *gin.Context) {
 }
 
 func (cfg *Config) handlerUsersRead(c *gin.Context) {
-	//get info from form
-	//hash the password
-	//get password from db using username
-	//compare
-	handlerPlaceholder(c)
+	param := models.UserLogin{}
+	if err := c.ShouldBindJSON(&param); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	fmt.Printf("user: %s \npass: %s\n", param.Username, param.Password)
+	hashed, err := auth.HashPassword(param.Password)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "password hashing failed",
+		})
+		return
+	}
+	err = auth.CheckPasswordHash(hashed, param.Password)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "wrong password",
+		})
+	}
+	c.Header("HX-Redirect", "/dashboard")
 }
 
 func (cfg *Config) handlerUsersUpdate(c *gin.Context) {
@@ -48,3 +68,5 @@ func (cfg *Config) handlerUsersDelete(c *gin.Context) {
 	//delete user
 	handlerPlaceholder(c)
 }
+
+//c.Redirect(http.StatusMovedPermanently, "http://www.google.com/")

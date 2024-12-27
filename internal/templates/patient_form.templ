@@ -37,3 +37,7 @@ func (p *models.Patient) validateForm() map[string]string {
 templ createPatientForm(values models.Patient, errors map[string]string) {
 	<form hx-post="/patients/create" class="" id="createPatientForm" hx-encoding="json"></form>
 }
+
+// <button hx-delete="/patients/id" hx-confirm="Are you sure you wish to delete this patient's chart?">
+//     Delete
+// </button>

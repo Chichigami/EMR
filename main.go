@@ -37,23 +37,19 @@ func main() {
 	}
 
 	router := gin.Default() //default page should be login page
-	router.Static("/static", "../frontend")
-	router.LoadHTMLFiles("../frontend/login.html", "../frontend/dashboard.html")
+
+	router.Static("/static", "./internal/static")
+	router.LoadHTMLGlob("internal/templates/*")
+	//router.Delims("{[{", "}]}")
+	//router.GET("/ping", handlerPlaceholder)
 
 	router.GET("/", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "login.html", gin.H{})
 	})
-	router.GET("/patient/new", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "patient_form.html", gin.H{})
-	})
-	router.Delims("{[{", "}]}")
-
-	router.GET("/ping", handlerPlaceholder)
-
 	login := router.Group("/login")
 	{
+		login.GET("", cfg.handlerUsersCreate)    //create new login if admin auth
 		login.POST("", cfg.handlerUsersRead)     //wait for login info, verifies
-		login.GET("", cfg.handlerUsersCreate)    //
 		login.PUT("", cfg.handlerUsersUpdate)    //update login
 		login.DELETE("", cfg.handlerUsersDelete) //delete login, need admin priv
 	}
@@ -85,6 +81,9 @@ func main() {
 		schedule.POST("/:ID", cfg.handlerAppointmentsCreate)   //schedule a patient
 		schedule.DELETE("/:ID", cfg.handlerAppointmentsDelete) //delete a patient's appointment
 	}
+	router.GET("/favicon.ico", func(c *gin.Context) {
+		c.Status(http.StatusNoContent)
+	})
 	router.Run(":8000")
 }
 
