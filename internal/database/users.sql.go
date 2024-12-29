@@ -9,7 +9,7 @@ import (
 	"context"
 )
 
-const createUser = `-- name: CreateUser :one
+const createUser = `-- name: CreateUser :exec
 INSERT INTO users (
     username, hashed_password, 
     last_name, first_name, 
@@ -20,7 +20,6 @@ VALUES(
     $3, $4, 
     $5
 )
-RETURNING id, created_at, updated_at, username, hashed_password, last_name, first_name, permissions
 `
 
 type CreateUserParams struct {
@@ -31,36 +30,65 @@ type CreateUserParams struct {
 	Permissions    string
 }
 
-func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
-	row := q.db.QueryRowContext(ctx, createUser,
+func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) error {
+	_, err := q.db.ExecContext(ctx, createUser,
 		arg.Username,
 		arg.HashedPassword,
 		arg.LastName,
 		arg.FirstName,
 		arg.Permissions,
 	)
-	var i User
-	err := row.Scan(
-		&i.ID,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-		&i.Username,
-		&i.HashedPassword,
-		&i.LastName,
-		&i.FirstName,
-		&i.Permissions,
-	)
-	return i, err
+	return err
 }
 
-const getHashedPassword = `-- name: GetHashedPassword :exec
-SELECT hashed_password
+const deleteUser = `-- name: DeleteUser :exec
+DELETE FROM users
+WHERE username = $1
+`
+
+func (q *Queries) DeleteUser(ctx context.Context, username string) error {
+	_, err := q.db.ExecContext(ctx, deleteUser, username)
+	return err
+}
+
+const getHashedPassword = `-- name: GetHashedPassword :one
+SELECT hashed_password, permissions
 FROM users
 WHERE username = $1
 `
 
-func (q *Queries) GetHashedPassword(ctx context.Context, username string) error {
-	_, err := q.db.ExecContext(ctx, getHashedPassword, username)
+type GetHashedPasswordRow struct {
+	HashedPassword string
+	Permissions    string
+}
+
+func (q *Queries) GetHashedPassword(ctx context.Context, username string) (GetHashedPasswordRow, error) {
+	row := q.db.QueryRowContext(ctx, getHashedPassword, username)
+	var i GetHashedPasswordRow
+	err := row.Scan(&i.HashedPassword, &i.Permissions)
+	return i, err
+}
+
+const updateUserInfo = `-- name: UpdateUserInfo :exec
+UPDATE users
+SET hashed_password = $2, last_name = $3, first_name = $4
+WHERE username = $1
+`
+
+type UpdateUserInfoParams struct {
+	Username       string
+	HashedPassword string
+	LastName       string
+	FirstName      string
+}
+
+func (q *Queries) UpdateUserInfo(ctx context.Context, arg UpdateUserInfoParams) error {
+	_, err := q.db.ExecContext(ctx, updateUserInfo,
+		arg.Username,
+		arg.HashedPassword,
+		arg.LastName,
+		arg.FirstName,
+	)
 	return err
 }
 

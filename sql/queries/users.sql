@@ -1,4 +1,4 @@
--- name: CreateUser :one
+-- name: CreateUser :exec
 INSERT INTO users (
     username, hashed_password, 
     last_name, first_name, 
@@ -8,15 +8,23 @@ VALUES(
     $1, $2, 
     $3, $4, 
     $5
-)
-RETURNING *;
+);
 
--- name: GetHashedPassword :exec
-SELECT hashed_password
+-- name: GetHashedPassword :one
+SELECT hashed_password, permissions
 FROM users
 WHERE username = $1;
 
 -- name: UpdateUserPermissions :exec
 UPDATE users
 SET permissions = $2, updated_at = NOW()
+WHERE username = $1;
+
+-- name: DeleteUser :exec
+DELETE FROM users
+WHERE username = $1;
+
+-- name: UpdateUserInfo :exec
+UPDATE users
+SET hashed_password = $2, last_name = $3, first_name = $4
 WHERE username = $1;

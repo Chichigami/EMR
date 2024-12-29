@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
@@ -11,24 +10,41 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// check auth, if not admin, then return error
+// from a form
+// hash password
 func (h *HandlerConfig) HandlerUsersCreate(c *gin.Context) {
-	//check auth, if not admin, then return error
-	//from a form
-	//hash password
-	account := database.CreateUserParams{
-		Username:       "",
-		HashedPassword: "",
-		LastName:       "",
-		FirstName:      "",
-		Permissions:    "",
+	param := models.UserLogin{}
+	if err := c.ShouldBindJSON(&param); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
 	}
-	_, err := h.Config.Datebase.CreateUser(c.Request.Context(), account)
+	//insert auth check
+	hashed, err := auth.HashPassword(param.Password)
+	account := database.CreateUserParams{
+		Username:       param.Username,
+		HashedPassword: hashed,
+		LastName:       param.Lastname,
+		FirstName:      param.Firstname,
+		Permissions:    param.Permission,
+	}
 	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "trouble making password",
+		})
+		return
+	}
+	if err := h.Config.Datebase.CreateUser(c.Request.Context(), account); err != nil {
 		log.Fatalf("User creation failed: %s", err.Error())
+		return
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"message": "user created",
+		"account": param,
 	})
+	return
 }
 
 // receives a http POST request and verifies login
@@ -42,15 +58,16 @@ func (h *HandlerConfig) HandlerUsersRead(c *gin.Context) {
 		})
 		return
 	}
-	fmt.Printf("user: %s \npass: %s\n", param.Username, param.Password)
-	hashed, err := auth.HashPassword(param.Password)
+
+	account, err := h.Config.Datebase.GetHashedPassword(c, param.Username)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "password hashing failed",
+			"error": "failed to verify username",
 		})
 		return
 	}
-	err = auth.CheckPasswordHash(hashed, param.Password)
+
+	err = auth.CheckPasswordHash(account.HashedPassword, param.Password)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "wrong password",
@@ -59,17 +76,58 @@ func (h *HandlerConfig) HandlerUsersRead(c *gin.Context) {
 	c.Header("HX-Redirect", "/dashboard")
 }
 
+// edit button request
+//
+// updates a user's info
 func (h *HandlerConfig) HandlerUsersUpdate(c *gin.Context) {
-	//check if auth matches auth in db or is admin
-	//update password if either
-	HandlerPlaceholder(c)
+	param := models.UpdateUserLogin{}
+	if err := c.ShouldBindJSON(&param); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	hashed, err := auth.HashPassword(param.NewPassword)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	err = h.Config.Datebase.UpdateUserInfo(c, database.UpdateUserInfoParams{
+		Username:       "get username from auth from cookie",
+		HashedPassword: hashed,
+		LastName:       param.Lastname,
+		FirstName:      param.Firstname,
+	})
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"message": "account updated",
+	})
+	return
 }
 
+// button request in account page
+//
+// deletes account
 func (h *HandlerConfig) HandlerUsersDelete(c *gin.Context) {
-	//check if auth is admin
-	//if not then return error
-	//delete user
-	HandlerPlaceholder(c)
+	//check account owner?
+	//hx-confirm
+	//hx-delete
+	err := h.Config.Datebase.DeleteUser(c, "auth_connection_to_username")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"message": "account deleted",
+	})
+	return
 }
-
-//c.Redirect(http.StatusMovedPermanently, "http://www.google.com/")

@@ -16,6 +16,3 @@ func (cfg *HandlerConfig) HandlerDashboardNotToday(c *gin.Context) {
 	//run this when date != today
 	HandlerPlaceholder(c)
 }
-
-// type dashboard struct {
-// }
