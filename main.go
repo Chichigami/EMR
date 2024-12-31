@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"os"
 
-	_ "github.com/a-h/templ"
+	"github.com/chichigami/EMR/internal/components"
 	"github.com/chichigami/EMR/internal/database"
 	"github.com/chichigami/EMR/internal/handlers"
 	"github.com/chichigami/EMR/internal/models"
@@ -42,13 +42,16 @@ func main() {
 
 	router := gin.Default() //default page should be login page
 
-	router.Static("/static", "./internal/static")
-	router.LoadHTMLGlob("internal/templates/*")
-	//router.Delims("{[{", "}]}")
-	//router.GET("/ping", handlerPlaceholder)
+	router.Static("/assets", "./internal/assets")
+	// router.LoadHTMLGlob("internal/templates/*")
 
 	router.GET("/", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "login.html", gin.H{})
+		page := components.Base("EMR Login", nil, components.Login(), nil)
+		c.Header("Content-Type", "text/html; charset=utf-8")
+		if err := page.Render(c, c.Writer); err != nil {
+			c.String(http.StatusInternalServerError, "Failed to render page: %v", err)
+			return
+		}
 	})
 	login := router.Group("/login")
 	{
