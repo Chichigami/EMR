@@ -14,18 +14,20 @@ import (
 const createPatient = `-- name: CreatePatient :one
 INSERT INTO patients (
     last_name, first_name, middle_name, 
-    date_of_birth, sex, social_security_number, 
+    date_of_birth, sex, gender, social_security_number, 
     pharmacy, email, location_address, zip_code, 
-    cell_phone_number, home_phone_number, 
-    marital_status, primary_care_doctor)
+    cell_phone_number, home_phone_number, marital_status, 
+    insurance, primary_care_doctor, 
+    extra_note)
 VALUES(
     $1, $2, $3,
-    $4, $5, $6,
-    $7, $8, $9, $10,
-    $11, $12,
-    $13, $14
+    $4, $5, $6, $7, 
+    $8, $9, $10, $11,
+    $12, $13, $14,
+    $15, $16,
+    $17
 )
-RETURNING id, created_at, updated_at, last_name, first_name, middle_name, date_of_birth, sex, gender, social_security_number, pharmacy, email, location_address, zip_code, cell_phone_number, home_phone_number, marital_status, chart_id, insurance, primary_care_doctor, extra_note
+RETURNING chart_id
 `
 
 type CreatePatientParams struct {
@@ -34,6 +36,7 @@ type CreatePatientParams struct {
 	MiddleName           sql.NullString
 	DateOfBirth          time.Time
 	Sex                  string
+	Gender               string
 	SocialSecurityNumber sql.NullString
 	Pharmacy             string
 	Email                sql.NullString
@@ -42,16 +45,19 @@ type CreatePatientParams struct {
 	CellPhoneNumber      sql.NullString
 	HomePhoneNumber      sql.NullString
 	MaritalStatus        sql.NullString
+	Insurance            sql.NullString
 	PrimaryCareDoctor    sql.NullString
+	ExtraNote            sql.NullString
 }
 
-func (q *Queries) CreatePatient(ctx context.Context, arg CreatePatientParams) (Patient, error) {
+func (q *Queries) CreatePatient(ctx context.Context, arg CreatePatientParams) (sql.NullInt32, error) {
 	row := q.db.QueryRowContext(ctx, createPatient,
 		arg.LastName,
 		arg.FirstName,
 		arg.MiddleName,
 		arg.DateOfBirth,
 		arg.Sex,
+		arg.Gender,
 		arg.SocialSecurityNumber,
 		arg.Pharmacy,
 		arg.Email,
@@ -60,33 +66,22 @@ func (q *Queries) CreatePatient(ctx context.Context, arg CreatePatientParams) (P
 		arg.CellPhoneNumber,
 		arg.HomePhoneNumber,
 		arg.MaritalStatus,
+		arg.Insurance,
 		arg.PrimaryCareDoctor,
+		arg.ExtraNote,
 	)
-	var i Patient
-	err := row.Scan(
-		&i.ID,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-		&i.LastName,
-		&i.FirstName,
-		&i.MiddleName,
-		&i.DateOfBirth,
-		&i.Sex,
-		&i.Gender,
-		&i.SocialSecurityNumber,
-		&i.Pharmacy,
-		&i.Email,
-		&i.LocationAddress,
-		&i.ZipCode,
-		&i.CellPhoneNumber,
-		&i.HomePhoneNumber,
-		&i.MaritalStatus,
-		&i.ChartID,
-		&i.Insurance,
-		&i.PrimaryCareDoctor,
-		&i.ExtraNote,
-	)
-	return i, err
+	var chart_id sql.NullInt32
+	err := row.Scan(&chart_id)
+	return chart_id, err
+}
+
+const deleteAllPatients = `-- name: DeleteAllPatients :exec
+DELETE FROM patients
+`
+
+func (q *Queries) DeleteAllPatients(ctx context.Context) error {
+	_, err := q.db.ExecContext(ctx, deleteAllPatients)
+	return err
 }
 
 const deletePatient = `-- name: DeletePatient :exec

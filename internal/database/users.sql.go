@@ -41,6 +41,15 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) error {
 	return err
 }
 
+const deleteAllUsers = `-- name: DeleteAllUsers :exec
+DELETE FROM users
+`
+
+func (q *Queries) DeleteAllUsers(ctx context.Context) error {
+	_, err := q.db.ExecContext(ctx, deleteAllUsers)
+	return err
+}
+
 const deleteUser = `-- name: DeleteUser :exec
 DELETE FROM users
 WHERE username = $1
@@ -51,21 +60,25 @@ func (q *Queries) DeleteUser(ctx context.Context, username string) error {
 	return err
 }
 
-const getHashedPassword = `-- name: GetHashedPassword :one
-SELECT hashed_password, permissions
+const getAccount = `-- name: GetAccount :one
+SELECT id, created_at, updated_at, username, hashed_password, last_name, first_name, permissions
 FROM users
 WHERE username = $1
 `
 
-type GetHashedPasswordRow struct {
-	HashedPassword string
-	Permissions    string
-}
-
-func (q *Queries) GetHashedPassword(ctx context.Context, username string) (GetHashedPasswordRow, error) {
-	row := q.db.QueryRowContext(ctx, getHashedPassword, username)
-	var i GetHashedPasswordRow
-	err := row.Scan(&i.HashedPassword, &i.Permissions)
+func (q *Queries) GetAccount(ctx context.Context, username string) (User, error) {
+	row := q.db.QueryRowContext(ctx, getAccount, username)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.Username,
+		&i.HashedPassword,
+		&i.LastName,
+		&i.FirstName,
+		&i.Permissions,
+	)
 	return i, err
 }
 

@@ -10,8 +10,8 @@ VALUES(
     $5
 );
 
--- name: GetHashedPassword :one
-SELECT hashed_password, permissions
+-- name: GetAccount :one
+SELECT *
 FROM users
 WHERE username = $1;
 
@@ -28,3 +28,6 @@ WHERE username = $1;
 UPDATE users
 SET hashed_password = $2, last_name = $3, first_name = $4
 WHERE username = $1;
+
+-- name: DeleteAllUsers :exec
+DELETE FROM users;
