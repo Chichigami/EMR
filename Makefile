@@ -4,3 +4,6 @@ go-install-templ:
 
 templ-generate:
 	templ generate
+
+run:
+	go build && ./EMR

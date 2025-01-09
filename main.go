@@ -32,10 +32,16 @@ func main() {
 	}
 	defer dbConnection.Close()
 
+	jwtSecret := os.Getenv("JWT_SECRET")
+	if jwtSecret == "" {
+		log.Fatal("JWT_SECRET must be set")
+	}
+
 	dbQueries := database.New(dbConnection)
 
 	cfg := models.Config{
-		Datebase: dbQueries,
+		Datebase:  dbQueries,
+		JWTSecret: jwtSecret,
 	}
 
 	h := handlers.NewHandlerConfig(&cfg)
@@ -91,5 +97,6 @@ func main() {
 	router.GET("/favicon.ico", func(c *gin.Context) {
 		c.Status(http.StatusNoContent)
 	})
+	router.GET("/ping", handlers.HandlerPlaceholder)
 	router.Run(":8000")
 }
