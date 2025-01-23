@@ -1,29 +1,117 @@
 package handlers
 
 import (
+	"fmt"
+	"log"
+	"net/http"
+	"strconv"
+	"time"
+
+	"github.com/chichigami/EMR/internal/database"
+	"github.com/chichigami/EMR/internal/models"
 	"github.com/gin-gonic/gin"
 )
 
-func (h *HandlerConfig) HandlerPatients(c *gin.Context) {
-	HandlerPlaceholder(c)
+func ConvertStringToDate(s string) (time.Time, error) {
+	if len(s) != 8 {
+		return time.Time{}, fmt.Errorf("need 8 numbers in YYYYMMDD format")
+	}
+	const shortForm = "20060102"
+	date, err := time.Parse(shortForm, s)
+	if err != nil {
+		return time.Time{}, err
+	}
+	return date, nil
 }
 
+// get patient data
+//
+// GET
+func (h *HandlerConfig) HandlerPatientsRead(c *gin.Context) {
+	patientStr := c.Param(":id")
+	patientID32, err := strconv.ParseInt(patientStr, 10, 32)
+	if err != nil {
+		log.Fatalf("converting patient id string to int failed")
+	}
+	dbPatient, err := h.Config.Datebase.GetPatient(c, database.NullInt32(int32(patientID32)))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	c.JSON(400, gin.H{
+		"patient": dbPatient,
+	})
+}
+
+// makes a new patient
+//
+// POST
 func (h *HandlerConfig) HandlerPatientsCreate(c *gin.Context) {
-	//make new patient into db
-	HandlerPlaceholder(c)
+	param := models.Patient{}
+	if err := c.ShouldBindJSON(&param); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	date, err := ConvertStringToDate(param.DateOfBirth)
+	if err != nil {
+		log.Printf("Failed to convert date: input=%s, error=%v", param.DateOfBirth, err)
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "converting date error",
+		})
+		return
+	}
+	patient, err := h.Config.Datebase.CreatePatient(c, database.CreatePatientParams{
+		LastName:             param.LastName,
+		FirstName:            param.FirstName,
+		MiddleName:           database.NullStringCheck(param.MiddleName),
+		DateOfBirth:          date,
+		Sex:                  param.Sex,
+		Gender:               param.Gender,
+		SocialSecurityNumber: database.NullStringCheck(param.SocialSecurityNumber),
+		Pharmacy:             param.Pharmacy,
+		Email:                database.NullStringCheck(param.Email),
+		LocationAddress:      param.LocationAddress,
+		ZipCode:              param.ZipCode,
+		CellPhoneNumber:      database.NullStringCheck(param.CellPhoneNumber),
+		HomePhoneNumber:      database.NullStringCheck(param.HomePhoneNumber),
+		MaritalStatus:        database.NullStringCheck(param.MaritalStatus),
+		Insurance:            database.NullStringCheck(param.Insurance),
+		PrimaryCareDoctor:    database.NullStringCheck(param.PrimaryCareDoctor),
+		ExtraNote:            database.NullStringCheck(param.ExtraNotes),
+	})
+	if err != nil {
+		c.JSON(500, gin.H{
+			"err": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"message":    "success",
+		"chart info": patient,
+	})
 }
 
 func (h *HandlerConfig) HandlerPatientsDelete(c *gin.Context) {
-	//delete patient from db
-	HandlerPlaceholder(c)
+	err := h.Config.Datebase.DeleteAllPatients(c)
+	if err != nil {
+		c.JSON(500, gin.H{
+			"err": err.Error(),
+		})
+		return
+	}
+	c.JSON(200, gin.H{
+		"message": "patient reset",
+	})
 }
 
-// func handlerPatientQuery(c *gin.Context) {
-// 	//client is unsure who patient is. query via id, name, dob
-// 	//call handlerPatient after
-// 	handlerPlaceholder(c)
-// }
-
 func (h *HandlerConfig) HandlerPatientsUpdate(c *gin.Context) {
+	//get patient data
+	//check which data collides
+	//update data
 	HandlerPlaceholder(c)
 }
