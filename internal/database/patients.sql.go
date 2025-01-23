@@ -27,7 +27,7 @@ VALUES(
     $15, $16,
     $17
 )
-RETURNING chart_id
+RETURNING patient_id
 `
 
 type CreatePatientParams struct {
@@ -70,9 +70,9 @@ func (q *Queries) CreatePatient(ctx context.Context, arg CreatePatientParams) (s
 		arg.PrimaryCareDoctor,
 		arg.ExtraNote,
 	)
-	var chart_id sql.NullInt32
-	err := row.Scan(&chart_id)
-	return chart_id, err
+	var patient_id sql.NullInt32
+	err := row.Scan(&patient_id)
+	return patient_id, err
 }
 
 const deleteAllPatients = `-- name: DeleteAllPatients :exec
@@ -86,22 +86,22 @@ func (q *Queries) DeleteAllPatients(ctx context.Context) error {
 
 const deletePatient = `-- name: DeletePatient :exec
 DELETE FROM patients
-WHERE chart_id = $1
+WHERE patient_id = $1
 `
 
-func (q *Queries) DeletePatient(ctx context.Context, chartID sql.NullInt32) error {
-	_, err := q.db.ExecContext(ctx, deletePatient, chartID)
+func (q *Queries) DeletePatient(ctx context.Context, patientID sql.NullInt32) error {
+	_, err := q.db.ExecContext(ctx, deletePatient, patientID)
 	return err
 }
 
 const getPatient = `-- name: GetPatient :one
-SELECT id, created_at, updated_at, last_name, first_name, middle_name, date_of_birth, sex, gender, social_security_number, pharmacy, email, location_address, zip_code, cell_phone_number, home_phone_number, marital_status, chart_id, insurance, primary_care_doctor, extra_note
+SELECT id, created_at, updated_at, last_name, first_name, middle_name, date_of_birth, sex, gender, social_security_number, pharmacy, email, location_address, zip_code, cell_phone_number, home_phone_number, marital_status, patient_id, insurance, primary_care_doctor, extra_note
 FROM patients
-WHERE chart_id = $1
+WHERE patient_id = $1
 `
 
-func (q *Queries) GetPatient(ctx context.Context, chartID sql.NullInt32) (Patient, error) {
-	row := q.db.QueryRowContext(ctx, getPatient, chartID)
+func (q *Queries) GetPatient(ctx context.Context, patientID sql.NullInt32) (Patient, error) {
+	row := q.db.QueryRowContext(ctx, getPatient, patientID)
 	var i Patient
 	err := row.Scan(
 		&i.ID,
@@ -121,7 +121,7 @@ func (q *Queries) GetPatient(ctx context.Context, chartID sql.NullInt32) (Patien
 		&i.CellPhoneNumber,
 		&i.HomePhoneNumber,
 		&i.MaritalStatus,
-		&i.ChartID,
+		&i.PatientID,
 		&i.Insurance,
 		&i.PrimaryCareDoctor,
 		&i.ExtraNote,

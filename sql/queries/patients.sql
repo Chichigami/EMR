@@ -14,16 +14,16 @@ VALUES(
     $15, $16,
     $17
 )
-RETURNING chart_id;
+RETURNING patient_id;
 
 -- name: DeletePatient :exec
 DELETE FROM patients
-WHERE chart_id = $1;
+WHERE patient_id = $1;
 
 -- name: GetPatient :one
 SELECT *
 FROM patients
-WHERE chart_id = $1;
+WHERE patient_id = $1;
 
 -- name: DeleteAllPatients :exec
 DELETE FROM patients;

@@ -4,7 +4,8 @@ CREATE TABLE appointments (
     created_at TIMESTAMP DEFAULT NOW() NOT NULL,
     updated_at TIMESTAMP DEFAULT NOW() NOT NULL,
     appointment_date DATE NOT NULL,
-    chart_id SERIAL NOT NULL REFERENCES patients(chart_id),
+    appointment_time TIMESTAMP NOT NULL,
+    patient_id SERIAL NOT NULL REFERENCES patients(patient_id),
     reasoning TEXT NULL
 );
 

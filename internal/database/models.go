@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/sqlc-dev/pqtype"
 )
 
 type Appointment struct {
@@ -16,8 +17,18 @@ type Appointment struct {
 	CreatedAt       time.Time
 	UpdatedAt       time.Time
 	AppointmentDate time.Time
-	ChartID         int32
+	AppointmentTime time.Time
+	PatientID       int32
 	Reasoning       sql.NullString
+}
+
+type Chart struct {
+	ID           uuid.UUID
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
+	PatientID    int32
+	Note         pqtype.NullRawMessage
+	SignedStatus sql.NullBool
 }
 
 type Patient struct {
@@ -38,7 +49,7 @@ type Patient struct {
 	CellPhoneNumber      sql.NullString
 	HomePhoneNumber      sql.NullString
 	MaritalStatus        sql.NullString
-	ChartID              sql.NullInt32
+	PatientID            sql.NullInt32
 	Insurance            sql.NullString
 	PrimaryCareDoctor    sql.NullString
 	ExtraNote            sql.NullString
