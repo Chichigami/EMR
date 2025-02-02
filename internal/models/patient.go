@@ -1,9 +1,11 @@
 package models
 
+import "time"
+
 type Patient struct {
-	LastName             string `json:"last_name"`
 	FirstName            string `json:"first_name"`
 	MiddleName           string `json:"middle_name,omitempty"`
+	LastName             string `json:"last_name"`
 	DateOfBirth          string `json:"date_of_birth"`
 	Sex                  string `json:"sex"`
 	Gender               string `json:"gender"`
@@ -18,4 +20,8 @@ type Patient struct {
 	Insurance            string `json:"insurance,omitempty"`
 	PrimaryCareDoctor    string `json:"primary_care_doctor,omitempty"`
 	ExtraNotes           string `json:"extra_notes,omitempty"`
+}
+
+type PatientCache struct {
+	LastAccessTime time.Time
 }

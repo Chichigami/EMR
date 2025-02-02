@@ -66,18 +66,26 @@ func main() {
 		login.PUT("", h.HandlerUsersUpdate)    //update login
 		login.DELETE("", h.HandlerUsersDelete) //delete login, need admin priv
 	}
-	dashboard := router.Group("/dashboard") //might just make it one handler. cache date in server. if date is today then grab cache?
-	{
-		dashboard.GET("", h.HandlerDashboardToday)          //show today's dashboard
-		dashboard.GET("/:date", h.HandlerDashboardNotToday) //show some date's dashboard (maybe yesterday)
-	}
+	// dashboard := router.Group("/dashboard") //might just make it one handler. cache date in server. if date is today then grab cache?
+	// {
+	// 	dashboard.GET("*date", h.HandlerDashboard) //defaults to current day dashboard
+	// }
+
+	router.GET("/patients/new", func(c *gin.Context) {
+		page := components.Base("New Patient", nil, components.PatientForm(), nil)
+		c.Header("Content-Type", "text/html; charset=utf-8")
+		if err := page.Render(c, c.Writer); err != nil {
+			c.String(http.StatusInternalServerError, "Failed to render page: %v", err)
+			return
+		}
+	})
 
 	patient := router.Group("/patients")
 	{
-		patient.POST("/new", h.HandlerPatientsCreate)   //add new patient
-		patient.GET("/:ID", h.HandlerPatients)          //show patient based on ID
-		patient.PUT("/:ID", h.HandlerPatientsUpdate)    //update patient info
-		patient.DELETE("/:ID", h.HandlerPatientsDelete) //delete existing patient, need admin perm
+		patient.POST("/create", h.HandlerPatientsCreate) //add new patient
+		patient.GET("/:ID", h.HandlerPatientsRead)       //show patient based on ID
+		patient.PUT("/:ID", h.HandlerPatientsUpdate)     //update patient info
+		patient.DELETE("/:ID", h.HandlerPatientsDelete)  //delete existing patient, need admin perm
 		//patient.GET("/:ID", handlerPatientQuery)     //query for patient based on patient id, name, dob
 	}
 
@@ -89,11 +97,11 @@ func main() {
 		charts.DELETE("/:ID", h.HandlerChartsDelete) //delete chart
 	}
 
-	schedule := router.Group("/schedule")
-	{
-		schedule.POST("/:ID", h.HandlerAppointmentsCreate)   //schedule a patient
-		schedule.DELETE("/:ID", h.HandlerAppointmentsDelete) //delete a patient's appointment
-	}
+	// schedule := router.Group("/schedule")
+	// {
+	// 	schedule.POST("/:ID", h.HandlerAppointmentsCreate)   //schedule a patient
+	// 	schedule.DELETE("/:ID", h.HandlerAppointmentsDelete) //delete a patient's appointment
+	// }
 	router.GET("/favicon.ico", func(c *gin.Context) {
 		c.Status(http.StatusNoContent)
 	})

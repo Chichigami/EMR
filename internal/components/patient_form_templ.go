@@ -8,45 +8,44 @@ package components
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-import "github.com/chichigami/EMR/internal/models"
+// type PatientConfig struct {
+// 	Patient *models.Patient
+// }
 
-type PatientConfig struct {
-	Patient *models.Patient
-}
+// func (p *PatientConfig) validateForm() map[string]string {
+// 	errors := make(map[string]string)
+// 	if len(p.Patient.LastName) == 0 {
+// 		errors["lname"] = "Please Fill in patient's last name"
+// 	}
+// 	if len(p.Patient.FirstName) == 0 {
+// 		errors["fname"] = "Please fill in patient's first name"
+// 	}
+// 	if len(p.Patient.DateOfBirth) == 0 {
+// 		errors["DoB"] = "Please fill in a date of birth"
+// 	}
+// 	if len(p.Patient.Sex) == 0 {
+// 		errors["sex"] = "Please fill in sex"
+// 	}
+// 	if p.Patient.Sex == "Other" || p.Patient.Sex == "O" {
+// 		errors["extranotes"] = "Please ask patient what organs they have"
+// 	}
+// 	if len(p.Patient.Gender) == 0 {
+// 		errors["gender"] = "Please fill in gender"
+// 	}
+// 	if len(p.Patient.LocationAddress) == 0 {
+// 		errors["address"] = "Please fill in address"
+// 	}
+// 	if len(p.Patient.ZipCode) == 0 {
+// 		errors["zipcode"] = "Please fill in zip code"
+// 	}
+// 	if len(p.Patient.CellPhoneNumber) == 0 && len(p.Patient.HomePhoneNumber) == 0 {
+// 		errors["phonenumber"] = "Please fill in one phone number"
+// 	}
+// 	return errors
+// }
 
-func (p *PatientConfig) validateForm() map[string]string {
-	errors := make(map[string]string)
-	if len(p.Patient.LastName) == 0 {
-		errors["lname"] = "Please Fill in patient's last name"
-	}
-	if len(p.Patient.FirstName) == 0 {
-		errors["fname"] = "Please fill in patient's first name"
-	}
-	if len(p.Patient.DateOfBirth) == 0 {
-		errors["DoB"] = "Please fill in a date of birth"
-	}
-	if len(p.Patient.Sex) == 0 {
-		errors["sex"] = "Please fill in sex"
-	}
-	if p.Patient.Sex == "Other" || p.Patient.Sex == "O" {
-		errors["extranotes"] = "Please ask patient what organs they have"
-	}
-	if len(p.Patient.Gender) == 0 {
-		errors["geneder"] = "Please fill in gender"
-	}
-	if len(p.Patient.LocationAddress) == 0 {
-		errors["address"] = "Please fill in address"
-	}
-	if len(p.Patient.ZipCode) == 0 {
-		errors["zipcode"] = "Please fill in zip code"
-	}
-	if len(p.Patient.CellPhoneNumber) == 0 && len(p.Patient.HomePhoneNumber) == 0 {
-		errors["phonenumber"] = "Please fill in one phone number"
-	}
-	return errors
-}
-
-func createPatientForm(values models.Patient, errors map[string]string) templ.Component {
+// loop through struct and make form in future
+func PatientForm() templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -67,7 +66,7 @@ func createPatientForm(values models.Patient, errors map[string]string) templ.Co
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<form hx-post=\"/patients/create\" class=\"\" id=\"createPatientForm\" hx-encoding=\"json\"></form>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div id=\"patient\"><h3>New Patient Form</h3></div><form hx-post=\"/patients/create\" hx-trigger=\"submit\" hx-target=\"#patient-create-response\" hx-headers=\"{&#34;Content-Type&#34;: &#34;application/json&#34;}\" hx-ext=\"json-enc\"><!-- NEED HTMX EXTENSION OTHERWISE IT WONT SEND VIA JSON WHY??!???!?!??--><div class=\"form-group\"><label>First name</label> <input type=\"text\" class=\"form-control\" name=\"first_name\" placeholder=\"Doe\" required></div><div class=\"form-group\"><label>Middle name</label> <input type=\"text\" class=\"form-control\" name=\"middle_name\" placeholder=\"Middle\"></div><div class=\"form-group\"><label>Last Name</label> <input type=\"text\" class=\"form-control\" name=\"last_name\" placeholder=\"John\" required></div><div class=\"form-group\"><label>Date of Birth</label> <input type=\"date\" class=\"form-control\" name=\"date_of_birth\" placeholder=\"19990906\" required></div><div class=\"form-group\"><label>Sex</label> <input type=\"text\" class=\"form-control\" name=\"sex\" placeholder=\"(M)ale / (F)emale\" required></div><div class=\"form-group\"><label>Gender</label> <input type=\"text\" class=\"form-control\" name=\"gender\" placeholder=\"(M)ale / (F)emale\" required></div><div class=\"form-group\"><label>Social Security Number</label> <input type=\"text\" class=\"form-control\" name=\"ssn\" placeholder=\"123-45-6789\" pattern=\"[0-9]{3}-[0-9]{2}-[0-9]{3}\"></div><div class=\"form-group\"><label>Pharmacy</label> <input type=\"text\" class=\"form-control\" name=\"pharmacy\" placeholder=\"Hello Pharmacy\" required></div><div class=\"form-group\"><label>Email</label> <input type=\"email\" class=\"form-control\" name=\"email\" placeholder=\"helloworld@email.com\"></div><div class=\"form-group\"><label>Address</label> <input type=\"text\" class=\"form-control\" name=\"location_address\" placeholder=\"123 street\" required></div><div class=\"form-group\"><label>Zip code</label> <input type=\"text\" class=\"form-control\" name=\"zip_code\" placeholder=\"zip code\" required></div><div class=\"form-group\"><label>Cell Phone</label> <input type=\"text\" class=\"form-control\" name=\"cell_phone\" placeholder=\"(123)456-7890\" pattern=\"[0-9]{3}-[0-9]{3}-[0-9]{4}\" required></div><div class=\"form-group\"><label>Home Phone</label> <input type=\"text\" class=\"form-control\" name=\"home_phone\" placeholder=\"(123)456-7890\" pattern=\"[0-9]{3}-[0-9]{3}-[0-9]{4}\"></div><div class=\"form-group\"><label>Martial Status</label> <input type=\"text\" class=\"form-control\" name=\"marital_status\" placeholder=\"Single / Married\"></div><div class=\"form-group\"><label>Insurance</label> <input type=\"text\" class=\"form-control\" name=\"insurance\" placeholder=\"Healthcare Insurance\"></div><div class=\"form-group\"><label>Primary Care Physician</label> <input type=\"text\" class=\"form-control\" name=\"primary_care_doctor\" placeholder=\"Dr. Frank\"></div><div class=\"form-group\"><label>Extra notes</label> <input type=\"text\" class=\"form-control\" name=\"extra_notes\" placeholder=\"Any notes like self pay or co pay\"></div><button type=\"submit\" class=\"btn primary\">Submit</button></form><div id=\"patient-create-response\"></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -75,9 +74,4 @@ func createPatientForm(values models.Patient, errors map[string]string) templ.Co
 	})
 }
 
-// <button hx-delete="/patients/id" hx-confirm="Are you sure you wish to delete this patient's chart?">
-//
-//	Delete
-//
-// </button>
 var _ = templruntime.GeneratedTemplate

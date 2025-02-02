@@ -17,7 +17,7 @@ CREATE TABLE patients (
     cell_phone_number TEXT NULL UNIQUE,
     home_phone_number TEXT NULL UNIQUE,
     marital_status TEXT NULL,
-    patient_id SERIAL UNIQUE,
+    patient_id SERIAL UNIQUE NOT NULL,
     insurance TEXT DEFAULT 'Self Pay',
     primary_care_doctor TEXT NULL,
     extra_note TEXT NULL

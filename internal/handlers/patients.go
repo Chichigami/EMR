@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/chichigami/EMR/internal/database"
@@ -13,11 +14,16 @@ import (
 )
 
 func ConvertStringToDate(s string) (time.Time, error) {
-	if len(s) != 8 {
+	//string to time.Time YYYYMMDD
+	//if s contains delimiters then split otherwise don't
+	splitted := strings.Split(s, "-")
+	formatted := fmt.Sprintf("%s%s%s", splitted[0], splitted[1], splitted[2])
+	fmt.Println(formatted)
+	if len(formatted) != 8 {
 		return time.Time{}, fmt.Errorf("need 8 numbers in YYYYMMDD format")
 	}
 	const shortForm = "20060102"
-	date, err := time.Parse(shortForm, s)
+	date, err := time.Parse(shortForm, formatted)
 	if err != nil {
 		return time.Time{}, err
 	}
@@ -56,6 +62,7 @@ func (h *HandlerConfig) HandlerPatientsCreate(c *gin.Context) {
 		})
 		return
 	}
+
 	date, err := ConvertStringToDate(param.DateOfBirth)
 	if err != nil {
 		log.Printf("Failed to convert date: input=%s, error=%v", param.DateOfBirth, err)
@@ -65,9 +72,9 @@ func (h *HandlerConfig) HandlerPatientsCreate(c *gin.Context) {
 		return
 	}
 	patient, err := h.Config.Datebase.CreatePatient(c, database.CreatePatientParams{
-		LastName:             param.LastName,
 		FirstName:            param.FirstName,
 		MiddleName:           database.NullStringCheck(param.MiddleName),
+		LastName:             param.LastName,
 		DateOfBirth:          date,
 		Sex:                  param.Sex,
 		Gender:               param.Gender,
