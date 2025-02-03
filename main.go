@@ -52,7 +52,7 @@ func main() {
 	// router.LoadHTMLGlob("internal/templates/*")
 
 	router.GET("/", func(c *gin.Context) {
-		page := components.Base("EMR Login", nil, components.Login(), nil)
+		page := components.Base("EMR Login", nil, components.Login(), components.DefaultFooter())
 		c.Header("Content-Type", "text/html; charset=utf-8")
 		if err := page.Render(c, c.Writer); err != nil {
 			c.String(http.StatusInternalServerError, "Failed to render page: %v", err)
@@ -72,7 +72,7 @@ func main() {
 	// }
 
 	router.GET("/patients/new", func(c *gin.Context) {
-		page := components.Base("New Patient", nil, components.PatientForm(), nil)
+		page := components.Base("New Patient", components.DefaultNavbar(), components.PatientForm(), components.DefaultFooter())
 		c.Header("Content-Type", "text/html; charset=utf-8")
 		if err := page.Render(c, c.Writer); err != nil {
 			c.String(http.StatusInternalServerError, "Failed to render page: %v", err)
