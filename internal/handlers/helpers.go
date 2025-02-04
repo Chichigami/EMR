@@ -1,6 +1,8 @@
-package database
+package handlers
 
-import "database/sql"
+import (
+	"database/sql"
+)
 
 func NullStringCheck(s string) sql.NullString {
 	return sql.NullString{
