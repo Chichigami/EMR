@@ -36,13 +36,13 @@ func Base(title string, navbar templ.Component, body templ.Component, footer tem
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/base.templ`, Line: 11, Col: 17}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/base.templ`, Line: 11, Col: 17}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</title><script src=\"/assets/htmx.min.js\"></script><script src=\"/assets/json-enc.js\"></script><link href=\"/assets/index.css\" rel=\"stylesheet\"></head><body>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</title><link rel=\"icon\" href=\"/assets/favicon.ico\" type=\"image/x-icon\"><script src=\"/assets/htmx.min.js\"></script><script src=\"/assets/json-enc.js\"></script><link href=\"/assets/index.css\" rel=\"stylesheet\"></head><body>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

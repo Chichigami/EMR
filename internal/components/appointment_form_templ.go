@@ -8,7 +8,7 @@ package components
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-func Login() templ.Component {
+func Appointment() templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -29,7 +29,7 @@ func Login() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div id=\"login\"><h3>Login</h3></div><form hx-post=\"/login\" hx-trigger=\"submit\" hx-headers=\"{&#34;Content-Type&#34;: &#34;application/json&#34;}\" hx-ext=\"json-enc\"><!-- NEED HTMX EXTENSION OTHERWISE IT WONT SEND VIA JSON WHY??!???!?!??--><div class=\"form-group\"><label>Username</label> <input type=\"text\" class=\"form-control\" name=\"username\" placeholder=\"Username\" required></div><div class=\"form-group\"><label>Password</label> <input type=\"password\" class=\"form-control\" name=\"password\" placeholder=\"Password\" required></div><button type=\"submit\" class=\"btn primary\">Login</button></form>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div id=\"scheduler\"><h3>Make New Appointment</h3></div><form hx-post=\"/schedule/create\" hx-trigger=\"submit\" hx-headers=\"{&#34;Content-Type&#34;: &#34;application/json&#34;}\" hx-ext=\"json-enc\"><div class=\"form-group\"><label>Patient ID: </label> <input type=\"text\" class=\"form-control\" name=\"patient_id\" required></div><div class=\"form-group\"><label>Appointment date and time</label> <input type=\"datetime-local\" class=\"form-control\" name=\"date_and_time\" required></div><div class=\"form-group\"><label>Reason: </label> <input type=\"text\" class=\"form-control\" name=\"reason\" required></div><button type=\"submit\" class=\"btn primary\">Make appointment</button></form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

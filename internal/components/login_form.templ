@@ -7,7 +7,6 @@ templ Login() {
 	<form
 		hx-post="/login"
 		hx-trigger="submit"
-		hx-target="#login-response"
 		hx-headers='{"Content-Type": "application/json"}'
 		hx-ext="json-enc"
 	>
@@ -24,5 +23,4 @@ templ Login() {
 			Login
 		</button>
 	</form>
-	<div id="login-response"></div>
 }
