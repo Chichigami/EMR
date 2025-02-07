@@ -2,13 +2,14 @@ package routes
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/chichigami/EMR/internal/components"
 	"github.com/chichigami/EMR/internal/handlers"
 	"github.com/gin-gonic/gin"
 )
 
-func LoadRoutes(r *gin.Engine, h *handlers.HandlerConfig) {
+func AddRoutes(r *gin.Engine, h *handlers.HandlerConfig) {
 	r.Static("/assets", "./internal/assets")
 
 	r.GET("/favicon.ico", func(c *gin.Context) {
@@ -78,4 +79,18 @@ func LoadRoutes(r *gin.Engine, h *handlers.HandlerConfig) {
 	r.GET("/ping", func(c *gin.Context) {
 		c.Status(http.StatusOK)
 	})
+
+	r.GET("/graceful", func(c *gin.Context) {
+		c.String(http.StatusOK, "Ping received! Processing...")
+		time.Sleep(2 * time.Second)
+		c.String(http.StatusOK, "Ping completed!")
+	})
+}
+
+func endpointGroup() {
+
+}
+
+func webpage() {
+
 }
