@@ -13,13 +13,12 @@ import (
 )
 
 type Appointment struct {
-	ID              uuid.UUID
-	CreatedAt       time.Time
-	UpdatedAt       time.Time
-	AppointmentDate time.Time
-	AppointmentTime time.Time
-	PatientID       int32
-	Reasoning       sql.NullString
+	ID          uuid.UUID
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+	Appointment time.Time
+	PatientID   int32
+	Reasoning   sql.NullString
 }
 
 type Chart struct {
@@ -49,7 +48,7 @@ type Patient struct {
 	CellPhoneNumber      sql.NullString
 	HomePhoneNumber      sql.NullString
 	MaritalStatus        sql.NullString
-	PatientID            sql.NullInt32
+	PatientID            int32
 	Insurance            sql.NullString
 	PrimaryCareDoctor    sql.NullString
 	ExtraNote            sql.NullString

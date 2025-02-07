@@ -15,29 +15,28 @@ import (
 
 const createAppointmentForPatient = `-- name: CreateAppointmentForPatient :one
 INSERT INTO appointments (
-    appointment_date, patient_id, reasoning
+    patient_id, appointment, reasoning
 ) 
 VALUES (
     $1, $2, $3
 )
-RETURNING id, created_at, updated_at, appointment_date, appointment_time, patient_id, reasoning
+RETURNING id, created_at, updated_at, appointment, patient_id, reasoning
 `
 
 type CreateAppointmentForPatientParams struct {
-	AppointmentDate time.Time
-	PatientID       int32
-	Reasoning       sql.NullString
+	PatientID   int32
+	Appointment time.Time
+	Reasoning   sql.NullString
 }
 
 func (q *Queries) CreateAppointmentForPatient(ctx context.Context, arg CreateAppointmentForPatientParams) (Appointment, error) {
-	row := q.db.QueryRowContext(ctx, createAppointmentForPatient, arg.AppointmentDate, arg.PatientID, arg.Reasoning)
+	row := q.db.QueryRowContext(ctx, createAppointmentForPatient, arg.PatientID, arg.Appointment, arg.Reasoning)
 	var i Appointment
 	err := row.Scan(
 		&i.ID,
 		&i.CreatedAt,
 		&i.UpdatedAt,
-		&i.AppointmentDate,
-		&i.AppointmentTime,
+		&i.Appointment,
 		&i.PatientID,
 		&i.Reasoning,
 	)
@@ -46,27 +45,22 @@ func (q *Queries) CreateAppointmentForPatient(ctx context.Context, arg CreateApp
 
 const deleteAppointment = `-- name: DeleteAppointment :exec
 DELETE FROM appointments
-WHERE patient_id = $1 AND appointment_date = $2
+WHERE id = $1
 `
 
-type DeleteAppointmentParams struct {
-	PatientID       int32
-	AppointmentDate time.Time
-}
-
-func (q *Queries) DeleteAppointment(ctx context.Context, arg DeleteAppointmentParams) error {
-	_, err := q.db.ExecContext(ctx, deleteAppointment, arg.PatientID, arg.AppointmentDate)
+func (q *Queries) DeleteAppointment(ctx context.Context, id uuid.UUID) error {
+	_, err := q.db.ExecContext(ctx, deleteAppointment, id)
 	return err
 }
 
 const getAppointmentsBasedOnDay = `-- name: GetAppointmentsBasedOnDay :many
-SELECT id, created_at, updated_at, appointment_date, appointment_time, patient_id, reasoning
+SELECT id, created_at, updated_at, appointment, patient_id, reasoning
 FROM appointments
-WHERE appointment_date = $1
+WHERE appointment = $1
 `
 
-func (q *Queries) GetAppointmentsBasedOnDay(ctx context.Context, appointmentDate time.Time) ([]Appointment, error) {
-	rows, err := q.db.QueryContext(ctx, getAppointmentsBasedOnDay, appointmentDate)
+func (q *Queries) GetAppointmentsBasedOnDay(ctx context.Context, appointment time.Time) ([]Appointment, error) {
+	rows, err := q.db.QueryContext(ctx, getAppointmentsBasedOnDay, appointment)
 	if err != nil {
 		return nil, err
 	}
@@ -78,8 +72,7 @@ func (q *Queries) GetAppointmentsBasedOnDay(ctx context.Context, appointmentDate
 			&i.ID,
 			&i.CreatedAt,
 			&i.UpdatedAt,
-			&i.AppointmentDate,
-			&i.AppointmentTime,
+			&i.Appointment,
 			&i.PatientID,
 			&i.Reasoning,
 		); err != nil {
@@ -98,17 +91,16 @@ func (q *Queries) GetAppointmentsBasedOnDay(ctx context.Context, appointmentDate
 
 const updateAppointment = `-- name: UpdateAppointment :exec
 UPDATE appointments
-SET appointment_date = $2, appointment_time = $3, updated_at = NOW()
+SET appointment = $2, updated_at = NOW()
 WHERE id = $1
 `
 
 type UpdateAppointmentParams struct {
-	ID              uuid.UUID
-	AppointmentDate time.Time
-	AppointmentTime time.Time
+	ID          uuid.UUID
+	Appointment time.Time
 }
 
 func (q *Queries) UpdateAppointment(ctx context.Context, arg UpdateAppointmentParams) error {
-	_, err := q.db.ExecContext(ctx, updateAppointment, arg.ID, arg.AppointmentDate, arg.AppointmentTime)
+	_, err := q.db.ExecContext(ctx, updateAppointment, arg.ID, arg.Appointment)
 	return err
 }

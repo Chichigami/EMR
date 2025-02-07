@@ -50,7 +50,7 @@ type CreatePatientParams struct {
 	ExtraNote            sql.NullString
 }
 
-func (q *Queries) CreatePatient(ctx context.Context, arg CreatePatientParams) (sql.NullInt32, error) {
+func (q *Queries) CreatePatient(ctx context.Context, arg CreatePatientParams) (int32, error) {
 	row := q.db.QueryRowContext(ctx, createPatient,
 		arg.LastName,
 		arg.FirstName,
@@ -70,7 +70,7 @@ func (q *Queries) CreatePatient(ctx context.Context, arg CreatePatientParams) (s
 		arg.PrimaryCareDoctor,
 		arg.ExtraNote,
 	)
-	var patient_id sql.NullInt32
+	var patient_id int32
 	err := row.Scan(&patient_id)
 	return patient_id, err
 }
@@ -89,7 +89,7 @@ DELETE FROM patients
 WHERE patient_id = $1
 `
 
-func (q *Queries) DeletePatient(ctx context.Context, patientID sql.NullInt32) error {
+func (q *Queries) DeletePatient(ctx context.Context, patientID int32) error {
 	_, err := q.db.ExecContext(ctx, deletePatient, patientID)
 	return err
 }
@@ -100,7 +100,7 @@ FROM patients
 WHERE patient_id = $1
 `
 
-func (q *Queries) GetPatient(ctx context.Context, patientID sql.NullInt32) (Patient, error) {
+func (q *Queries) GetPatient(ctx context.Context, patientID int32) (Patient, error) {
 	row := q.db.QueryRowContext(ctx, getPatient, patientID)
 	var i Patient
 	err := row.Scan(
