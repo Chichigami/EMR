@@ -11,3 +11,8 @@ RETURNING *;
 UPDATE charts 
 SET note = $2, updated_at = NOW()
 WHERE patient_id = $1;
+
+-- name: GetPatientCharts :many
+SELECT *
+FROM charts
+WHERE patient_id = $1;

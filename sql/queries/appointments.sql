@@ -20,3 +20,8 @@ WHERE appointment = $1;
 UPDATE appointments
 SET appointment = $2, updated_at = NOW()
 WHERE id = $1;
+
+-- name: GetAppointmentBasedOnPatient :many
+SELECT *
+FROM appointments
+WHERE patient_id = $1;
