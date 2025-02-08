@@ -2,15 +2,13 @@ package components
 
 import (
 	"fmt"
+	"github.com/chichigami/EMR/internal/database"
 	"github.com/chichigami/EMR/internal/models"
 )
 
 templ PatientDashboard(info models.PatientInfo) {
-	<ul>
-		for _, appointment := range info.Appointments {
-			<li>{ appointment.Appointment.Format("01/02/2006 03:04 PM") }</li>
-		}
-	</ul>
+	@patientAppointmentPage(info.Appointments)
+	@patientChartPage(info.Charts)
 }
 
 templ PatientNavbar(last_name, first_name string, id string) {
@@ -19,6 +17,22 @@ templ PatientNavbar(last_name, first_name string, id string) {
 		<ul class="nav-tabs">
 			<li>patient_dob</li>
 			<li>pcp</li>
+			<li>edit patient info</li>
+			<li>add new appointment</li>
 		</ul>
 	</nav>
+}
+
+templ patientChartPage(charts []database.Chart) {
+	<label>hello world</label>
+}
+
+templ patientAppointmentPage(appointments []database.Appointment) {
+	<ul>
+		for _, appointment := range appointments {
+			<li>{ appointment.Appointment.Format("01/02/2006 03:04 PM") }</li>
+			<button>edit</button>
+			<button hx-delete={ string(templ.SafeURL(fmt.Sprintf("/schedule/%v", appointment.ID))) } hx-confirm="Are you sure?">delete</button>
+		}
+	</ul>
 }
