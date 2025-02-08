@@ -1,0 +1,24 @@
+package components
+
+import (
+	"fmt"
+	"github.com/chichigami/EMR/internal/models"
+)
+
+templ PatientDashboard(info models.PatientInfo) {
+	<ul>
+		for _, appointment := range info.Appointments {
+			<li>{ appointment.Appointment.Format("01/02/2006 03:04 PM") }</li>
+		}
+	</ul>
+}
+
+templ PatientNavbar(last_name, first_name string, id string) {
+	<nav class="navbar">
+		<a href={ templ.URL(fmt.Sprintf("/patients/%s", id)) } class="logo">{ fmt.Sprintf("%s, %s", last_name, first_name) }</a>
+		<ul class="nav-tabs">
+			<li>patient_dob</li>
+			<li>pcp</li>
+		</ul>
+	</nav>
+}

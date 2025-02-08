@@ -44,7 +44,6 @@ templ PatientForm() {
 	<form
 		hx-post="/patients/create"
 		hx-trigger="submit"
-		hx-target="#patient-create-response"
 		hx-headers='{"Content-Type": "application/json"}'
 		hx-ext="json-enc"
 	>
@@ -115,7 +114,7 @@ templ PatientForm() {
 		</div>
 		<div class="form-group">
 			<label>Extra notes</label>
-			<input type="text" class="form-control" name="extra_notes" placeholder="Any notes like self pay or co pay"/>
+			<textarea type="text" class="form-control" name="extra_notes" placeholder="Any notes like self pay or co pay"></textarea>
 		</div>
 		<button type="submit" class="btn primary">
 			Submit

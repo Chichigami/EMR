@@ -1,6 +1,10 @@
 package models
 
-import "time"
+import (
+	"time"
+
+	"github.com/chichigami/EMR/internal/database"
+)
 
 type Patient struct {
 	FirstName            string `json:"first_name"`
@@ -24,4 +28,12 @@ type Patient struct {
 
 type PatientCache struct {
 	LastAccessTime time.Time
+}
+
+type PatientInfo struct {
+	First_Name   string
+	Last_Name    string
+	Patient_ID   string
+	Appointments []database.Appointment
+	Charts       []database.Chart
 }
