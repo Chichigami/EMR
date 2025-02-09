@@ -19,6 +19,7 @@ templ PatientNavbar(last_name, first_name string, id string) {
 			<li>pcp</li>
 			<li>edit patient info</li>
 			<li>add new appointment</li>
+			<li><button hx-delete={ string(templ.SafeURL(fmt.Sprintf("/patients/%s", id))) }>DELETE PATIENT</button></li>
 		</ul>
 	</nav>
 }
