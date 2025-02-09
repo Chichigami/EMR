@@ -34,6 +34,42 @@ func (q *Queries) CreateChart(ctx context.Context, patientID int32) (Chart, erro
 	return i, err
 }
 
+const getPatientCharts = `-- name: GetPatientCharts :many
+SELECT id, created_at, updated_at, patient_id, note, signed_status
+FROM charts
+WHERE patient_id = $1
+`
+
+func (q *Queries) GetPatientCharts(ctx context.Context, patientID int32) ([]Chart, error) {
+	rows, err := q.db.QueryContext(ctx, getPatientCharts, patientID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Chart
+	for rows.Next() {
+		var i Chart
+		if err := rows.Scan(
+			&i.ID,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.PatientID,
+			&i.Note,
+			&i.SignedStatus,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const updateChart = `-- name: UpdateChart :exec
 UPDATE charts 
 SET note = $2, updated_at = NOW()

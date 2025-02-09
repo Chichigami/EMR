@@ -53,6 +53,42 @@ func (q *Queries) DeleteAppointment(ctx context.Context, id uuid.UUID) error {
 	return err
 }
 
+const getAppointmentBasedOnPatient = `-- name: GetAppointmentBasedOnPatient :many
+SELECT id, created_at, updated_at, appointment, patient_id, reasoning
+FROM appointments
+WHERE patient_id = $1
+`
+
+func (q *Queries) GetAppointmentBasedOnPatient(ctx context.Context, patientID int32) ([]Appointment, error) {
+	rows, err := q.db.QueryContext(ctx, getAppointmentBasedOnPatient, patientID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Appointment
+	for rows.Next() {
+		var i Appointment
+		if err := rows.Scan(
+			&i.ID,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.Appointment,
+			&i.PatientID,
+			&i.Reasoning,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getAppointmentsBasedOnDay = `-- name: GetAppointmentsBasedOnDay :many
 SELECT id, created_at, updated_at, appointment, patient_id, reasoning
 FROM appointments
