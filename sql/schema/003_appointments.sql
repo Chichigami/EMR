@@ -4,7 +4,7 @@ CREATE TABLE appointments (
     created_at TIMESTAMP DEFAULT NOW() NOT NULL,
     updated_at TIMESTAMP DEFAULT NOW() NOT NULL,
     appointment TIMESTAMP NOT NULL,
-    patient_id SERIAL NOT NULL REFERENCES patients(patient_id),
+    patient_id INT NOT NULL REFERENCES patients(patient_id) ON DELETE CASCADE,
     reasoning TEXT NULL
 );
 
