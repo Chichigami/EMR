@@ -45,13 +45,15 @@ func AddRoutes(r *gin.Engine, h *handlers.HandlerConfig) {
 	// 	dashboard.GET("*date", h.HandlerDashboard) //defaults to current day dashboard
 	// }
 
-	patient := r.Group("/patients")
+	patients := r.Group("/patients")
 	{
-		patient.POST("/create", h.HandlerPatientsCreate) //add new patient
-		patient.GET("/:id", h.HandlerPatientsRead)       //show patient based on id
-		//patient.PUT("/:id", h.HandlerPatientsUpdate)     //update patient info
-		patient.DELETE("/:id", h.HandlerPatientsDelete) //delete existing patient, need admin perm
-		//patient.GET("/:id", handlerPatientQuery)     //query for patient based on patient id, name, dob
+		patients.POST("/create", h.HandlerPatientsCreate) //add new patient
+		patients.GET("/:id", h.HandlerPatientsRead)       //show patient based on id
+		//patients.PUT("/:id", h.HandlerPatientsUpdate)     //update patient info
+		patients.DELETE("/:id", h.HandlerPatientsDelete) //delete existing patient, need admin perm
+		//patients.GET("/:id", handlerPatientQuery)     //query for patient based on patient id, name, dob
+		patients.GET("/dne", handlers.HandlerPatientDNE)
+		patients.POST("/danger/delete", h.HandlerPatientDeleteAll)
 	}
 
 	// charts := r.Group("/patients/charts")
@@ -62,7 +64,7 @@ func AddRoutes(r *gin.Engine, h *handlers.HandlerConfig) {
 	// 	charts.DELETE("/:id", h.HandlerChartsDelete) //delete chart
 	// }
 
-	schedule := r.Group("/schedule")
+	schedule := r.Group("/appointments")
 	{
 		schedule.POST("/create", h.HandlerAppointmentsCreate) //schedule a patient
 		schedule.DELETE("/:id", h.HandlerAppointmentsDelete)  //delete a patient's appointment
