@@ -26,3 +26,20 @@ templ Base(title string, navbar templ.Component, body templ.Component, footer te
 		}
 	</html>
 }
+
+templ DefaultNavbar() {
+	<nav class="navbar">
+		<a href="/dashboard" class="logo">EMR</a>
+	</nav>
+}
+
+templ DefaultFooter() {
+	<footer class="footer">
+		<p>Contact me: <a href="mailto:g.feng.work@gmail.com">g.feng.work@gmail.com</a></p>
+		<p>
+			<a href="https://github.com/Chichigami" target="_blank" rel="noopener noreferrer">GitHub</a> |
+			<a href="https://www.linkedin.com/in/gary-feng-847156241/" target="_blank" rel="noopener noreferrer">LinkedIn</a> |
+			<a href="https://www.boot.dev/u/chichigami" target="_blank" rel="noopener noreferrer">Boot.dev</a>
+		</p>
+	</footer>
+}
