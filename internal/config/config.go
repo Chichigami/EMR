@@ -4,15 +4,14 @@ import (
 	"database/sql"
 	"log"
 	"os"
-	"time"
 
 	"github.com/chichigami/EMR/internal/database"
-	"github.com/chichigami/EMR/internal/models"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
+	"github.com/redis/go-redis/v9"
 )
 
-func LoadConfig() (*Config, *sql.DB) {
+func LoadConfig() (*Config, func()) {
 	if err := godotenv.Load(".env"); err != nil {
 		log.Fatalf("Error loading .env file")
 	}
@@ -33,18 +32,34 @@ func LoadConfig() (*Config, *sql.DB) {
 		log.Fatal("JWT_SECRET must be set")
 	}
 
+	rdb := redis.NewClient(&redis.Options{
+		Addr:     "localhost:6379",
+		Password: "",
+		DB:       0,
+		Protocol: 2,
+	})
 	dbQueries := database.New(dbConnection)
 
 	cfg := &Config{
 		Database:  dbQueries,
 		JWTSecret: jwtSecret,
+		Cache:     rdb,
 	}
-	return cfg, dbConnection
+
+	cleanup := func() {
+		if err := dbConnection.Close(); err != nil {
+			log.Printf("Error closing database: %v", err)
+		}
+		if err := rdb.Close(); err != nil {
+			log.Printf("Error closing redis: %v", err)
+		}
+	}
+
+	return cfg, cleanup
 }
 
 type Config struct {
-	Database       *database.Queries
-	JWTSecret      string
-	DashboardCache map[time.Time]string
-	PatientCache   map[string]models.Patient
+	Database  *database.Queries
+	JWTSecret string
+	Cache     *redis.Client
 }
