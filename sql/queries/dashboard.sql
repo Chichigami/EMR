@@ -5,4 +5,14 @@ INSERT INTO dashboards (
 VALUES (
     $1, $2
 )
-RETURNING *;
+RETURNING dashboard_state;
+
+-- name: GetDashboard :one
+SELECT dashboard_state
+FROM dashboards
+WHERE date_of = $1;
+
+-- name: UpdateDashboard :exec
+UPDATE dashboards
+SET dashboard_state = $2, updated_at = NOW()
+WHERE date_of = $1;

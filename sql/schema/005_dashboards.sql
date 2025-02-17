@@ -4,7 +4,7 @@ CREATE TABLE dashboards (
     created_at TIMESTAMP DEFAULT NOW() NOT NULL,
     updated_at TIMESTAMP DEFAULT NOW() NOT NULL,
     date_of TIMESTAMP NOT NULL,
-    dashboard_state JSONB DEFAULT NULL, 
+    dashboard_state JSONB DEFAULT NULL
 );
 
 -- +goose Down
