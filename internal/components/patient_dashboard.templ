@@ -18,20 +18,25 @@ templ PatientNavbar(last_name, first_name string, id string) {
 			<li>patient_dob</li>
 			<li>pcp</li>
 			<li>edit patient info</li>
-			<li>add new appointment</li>
+			<li><button hx-get="/schedule/modal" hx-target="#modal-container">Make new appointment</button></li>
+			<div id="modal-container"></div>
 			<li><button hx-delete={ string(templ.SafeURL(fmt.Sprintf("/patients/%s", id))) }>DELETE PATIENT</button></li>
 		</ul>
 	</nav>
 }
 
 templ patientChartPage(charts []database.Chart) {
-	<label>hello world</label>
+	<ul>
+		for _, chart := range charts {
+			<li><button>{ chart.ID.String() }</button></li>
+		}
+	</ul>
 }
 
 templ patientAppointmentPage(appointments []database.Appointment) {
 	<ul>
 		for _, appointment := range appointments {
-			<li>{ appointment.Appointment.Format("01/02/2006 03:04 PM") }</li>
+			<li>{ appointment.DateOf.Format("01/02/2006 03:04 PM") }</li>
 			<button>edit</button>
 			<button hx-delete={ string(templ.SafeURL(fmt.Sprintf("/schedule/%v", appointment.ID))) } hx-confirm="Are you sure?">delete</button>
 		}

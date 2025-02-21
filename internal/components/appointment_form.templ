@@ -5,7 +5,7 @@ templ Appointment() {
 		<h3>Make New Appointment</h3>
 	</div>
 	<form
-		hx-post="/schedule/create"
+		hx-post="/appointments/create"
 		hx-trigger="submit"
 		hx-headers='{"Content-Type": "application/json"}'
 		hx-ext="json-enc"
@@ -26,15 +26,45 @@ templ Appointment() {
 			Make appointment
 		</button>
 	</form>
-	// <script>
-	// document.body.addEventListener("showToast", function() {
-	// 	Swal.fire({
-	// 		title: "Create Patient",
-	// 		text: "Redirecting to patient profile...",
-	// 		icon: "success",
-	// 		timer: 2000,
-	// 		showConfirmButton: false
-	// 	});
-	// });
-	// </script>
+}
+
+templ Modal_Appointment() {
+	<style>
+	.modal-overlay{
+		position: fixed;
+		left: 0;
+		right: 0;
+		top: 0;
+		bottom: 0;
+		z-index: 1;
+		background-color: grey;
+	}
+	.modal-content{
+		background-color: white;
+		padding: 20px;
+		width: 50%;
+		border: 1px solid black;
+		margin: 15% auto;
+	}
+	</style>
+	<form
+		hx-post="/schedule/create"
+		hx-trigger="submit"
+		hx-headers='{"Content-Type": "application/json"}'
+		hx-ext="json-enc"
+	>
+		<div class="modal-overlay" hx-trigger="click" hx-target="#modal-container" hx-get="/schedule/null">
+			<div class="modal-content" hx-trigger="click consume">
+				<label>Patient ID: </label>
+				<input type="text" class="form-control" name="patient_id" required/>
+				<label>Appointment date and time</label>
+				<input type="datetime-local" class="form-control" name="date_and_time" required/>
+				<label>Reason: </label>
+				<input type="text" class="form-control" name="reason" required/>
+				<button type="submit" class="btn primary">
+					Make appointment
+				</button>
+			</div>
+		</div>
+	</form>
 }

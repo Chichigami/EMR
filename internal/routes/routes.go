@@ -40,10 +40,11 @@ func AddRoutes(r *gin.Engine, h *handlers.HandlerConfig) {
 		login.DELETE("", h.HandlerDeleteAllUser)
 	}
 
-	// dashboard := r.Group("/dashboard")
-	// {
-	// 	dashboard.GET("*date", h.HandlerDashboard) //defaults to current day dashboard
-	// }
+	dashboard := r.Group("/dashboard")
+	{
+		dashboard.GET("", h.HandlerDashboard) //defaults to current day dashboard
+		// 	dashboard.POST("*date/items", h.HandlerDashboardUpdate)
+	}
 
 	patients := r.Group("/patients")
 	{
@@ -64,10 +65,12 @@ func AddRoutes(r *gin.Engine, h *handlers.HandlerConfig) {
 	// 	charts.DELETE("/:id", h.HandlerChartsDelete) //delete chart
 	// }
 
-	schedule := r.Group("/appointments")
+	schedule := r.Group("/schedule")
 	{
+		schedule.GET("/modal", renderAppointmentModal)
 		schedule.POST("/create", h.HandlerAppointmentsCreate) //schedule a patient
 		schedule.DELETE("/:id", h.HandlerAppointmentsDelete)  //delete a patient's appointment
+		schedule.GET("/null", nullModal)
 	}
 }
 
@@ -96,4 +99,16 @@ func renderSchedulePage(c *gin.Context) {
 		c.String(http.StatusInternalServerError, "Failed to render page: %v", err)
 		return
 	}
+}
+
+func renderAppointmentModal(c *gin.Context) {
+	c.Header("Content-Type", "text/html; charset=utf-8")
+	if err := components.Modal_Appointment().Render(c, c.Writer); err != nil {
+		c.String(http.StatusInternalServerError, "Failed to render page: %v", err)
+		return
+	}
+}
+
+func nullModal(c *gin.Context) {
+	c.String(http.StatusOK, "")
 }
