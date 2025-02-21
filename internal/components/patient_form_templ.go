@@ -8,42 +8,6 @@ package components
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-// type PatientConfig struct {
-// 	Patient *models.Patient
-// }
-
-// func (p *PatientConfig) validateForm() map[string]string {
-// 	errors := make(map[string]string)
-// 	if len(p.Patient.LastName) == 0 {
-// 		errors["lname"] = "Please Fill in patient's last name"
-// 	}
-// 	if len(p.Patient.FirstName) == 0 {
-// 		errors["fname"] = "Please fill in patient's first name"
-// 	}
-// 	if len(p.Patient.DateOfBirth) == 0 {
-// 		errors["DoB"] = "Please fill in a date of birth"
-// 	}
-// 	if len(p.Patient.Sex) == 0 {
-// 		errors["sex"] = "Please fill in sex"
-// 	}
-// 	if p.Patient.Sex == "Other" || p.Patient.Sex == "O" {
-// 		errors["extranotes"] = "Please ask patient what organs they have"
-// 	}
-// 	if len(p.Patient.Gender) == 0 {
-// 		errors["gender"] = "Please fill in gender"
-// 	}
-// 	if len(p.Patient.LocationAddress) == 0 {
-// 		errors["address"] = "Please fill in address"
-// 	}
-// 	if len(p.Patient.ZipCode) == 0 {
-// 		errors["zipcode"] = "Please fill in zip code"
-// 	}
-// 	if len(p.Patient.CellPhoneNumber) == 0 && len(p.Patient.HomePhoneNumber) == 0 {
-// 		errors["phonenumber"] = "Please fill in one phone number"
-// 	}
-// 	return errors
-// }
-
 // loop through struct and make form in future
 func PatientForm() templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {

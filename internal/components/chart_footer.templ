@@ -1,0 +1,12 @@
+package components
+
+templ DoctorFooter(doctor string) {
+	<footer class="footer">
+		<p>
+			<a>{ doctor } </a>
+			<button hx-put="/patients/charts">
+				Save Chart
+			</button>
+		</p>
+	</footer>
+}
