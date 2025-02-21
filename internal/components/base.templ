@@ -1,5 +1,7 @@
 package components
 
+import "time"
+
 templ Base(title string, navbar templ.Component, body templ.Component, footer templ.Component) {
 	<!DOCTYPE html>
 	<html lang="en">
@@ -12,6 +14,7 @@ templ Base(title string, navbar templ.Component, body templ.Component, footer te
 			<link rel="icon" href="/assets/favicon.ico" type="image/x-icon"/>
 			<script src="/assets/htmx.min.js"></script>
 			<script src="/assets/json-enc.js"></script>
+			<script src="/assets/Sortable.min.js"></script>
 			//<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 			<link href="/assets/index.css" rel="stylesheet"/>
 		</head>
@@ -30,6 +33,26 @@ templ Base(title string, navbar templ.Component, body templ.Component, footer te
 templ DefaultNavbar() {
 	<nav class="navbar">
 		<a href="/dashboard" class="logo">EMR</a>
+		<h3>
+			Find Patient
+			<span class="htmx-indicator">
+				<img src="/img/bars.svg"/> Searching...
+			</span>
+		</h3>
+		<input
+			class="form-control"
+			type="search"
+			name="search"
+			placeholder="Begin Typing To Search Users..."
+			hx-post="/patients/search"
+			hx-trigger="input changed delay:500ms, keyup[key=='Enter'], load"
+			hx-target="#search-results"
+			hx-indicator=".htmx-indicator"
+		/>
+		<form hx-get="/dashboard" hx-trigger="change from:input[type=date]" hx-target="body">
+			<input type="date" name="date" value={ time.Now().Format("2006-01-02") }/>
+		</form>
+		<a>User icon</a>
 	</nav>
 }
 
