@@ -1,10 +1,14 @@
 -- name: CreateDashboard :one
 INSERT INTO dashboards (
     date_of, dashboard_state
-) 
+)
 VALUES (
     $1, $2
 )
+ON CONFLICT (
+    date_of
+)
+DO UPDATE SET dashboard_state = $2, updated_at = NOW()
 RETURNING dashboard_state;
 
 -- name: GetDashboard :one

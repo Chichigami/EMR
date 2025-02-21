@@ -19,7 +19,7 @@ INSERT INTO patients (
     cell_phone_number, home_phone_number, marital_status, 
     insurance, primary_care_doctor, 
     extra_note)
-VALUES(
+VALUES (
     $1, $2, $3,
     $4, $5, $6, $7, 
     $8, $9, $10, $11,

@@ -15,28 +15,28 @@ import (
 
 const createAppointmentForPatient = `-- name: CreateAppointmentForPatient :one
 INSERT INTO appointments (
-    patient_id, appointment, reasoning
+    patient_id, date_of, reasoning
 ) 
 VALUES (
     $1, $2, $3
 )
-RETURNING id, created_at, updated_at, appointment, patient_id, reasoning
+RETURNING id, created_at, updated_at, date_of, patient_id, reasoning
 `
 
 type CreateAppointmentForPatientParams struct {
-	PatientID   int32
-	Appointment time.Time
-	Reasoning   sql.NullString
+	PatientID int32
+	DateOf    time.Time
+	Reasoning sql.NullString
 }
 
 func (q *Queries) CreateAppointmentForPatient(ctx context.Context, arg CreateAppointmentForPatientParams) (Appointment, error) {
-	row := q.db.QueryRowContext(ctx, createAppointmentForPatient, arg.PatientID, arg.Appointment, arg.Reasoning)
+	row := q.db.QueryRowContext(ctx, createAppointmentForPatient, arg.PatientID, arg.DateOf, arg.Reasoning)
 	var i Appointment
 	err := row.Scan(
 		&i.ID,
 		&i.CreatedAt,
 		&i.UpdatedAt,
-		&i.Appointment,
+		&i.DateOf,
 		&i.PatientID,
 		&i.Reasoning,
 	)
@@ -53,8 +53,93 @@ func (q *Queries) DeleteAppointment(ctx context.Context, id uuid.UUID) error {
 	return err
 }
 
+const getAllPatientsOnDate = `-- name: GetAllPatientsOnDate :many
+SELECT 
+    p.first_name,
+    p.middle_name,
+    p.last_name,
+    p.date_of_birth,
+    p.sex,
+    p.gender,
+    p.social_security_number,
+    p.pharmacy,
+    p.email,
+    p.location_address,
+    p.zip_code,
+    p.cell_phone_number,
+    p.home_phone_number,
+    p.marital_status,
+    p.insurance,
+    p.primary_care_doctor,
+    p.extra_note
+FROM appointments a
+JOIN patients p ON a.patient_id = p.patient_id
+WHERE a.date_of::DATE = $1
+`
+
+type GetAllPatientsOnDateRow struct {
+	FirstName            string
+	MiddleName           sql.NullString
+	LastName             string
+	DateOfBirth          time.Time
+	Sex                  string
+	Gender               string
+	SocialSecurityNumber sql.NullString
+	Pharmacy             string
+	Email                sql.NullString
+	LocationAddress      string
+	ZipCode              string
+	CellPhoneNumber      sql.NullString
+	HomePhoneNumber      sql.NullString
+	MaritalStatus        sql.NullString
+	Insurance            sql.NullString
+	PrimaryCareDoctor    sql.NullString
+	ExtraNote            sql.NullString
+}
+
+func (q *Queries) GetAllPatientsOnDate(ctx context.Context, dateOf time.Time) ([]GetAllPatientsOnDateRow, error) {
+	rows, err := q.db.QueryContext(ctx, getAllPatientsOnDate, dateOf)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetAllPatientsOnDateRow
+	for rows.Next() {
+		var i GetAllPatientsOnDateRow
+		if err := rows.Scan(
+			&i.FirstName,
+			&i.MiddleName,
+			&i.LastName,
+			&i.DateOfBirth,
+			&i.Sex,
+			&i.Gender,
+			&i.SocialSecurityNumber,
+			&i.Pharmacy,
+			&i.Email,
+			&i.LocationAddress,
+			&i.ZipCode,
+			&i.CellPhoneNumber,
+			&i.HomePhoneNumber,
+			&i.MaritalStatus,
+			&i.Insurance,
+			&i.PrimaryCareDoctor,
+			&i.ExtraNote,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getAppointmentBasedOnPatient = `-- name: GetAppointmentBasedOnPatient :many
-SELECT id, created_at, updated_at, appointment, patient_id, reasoning
+SELECT id, created_at, updated_at, date_of, patient_id, reasoning
 FROM appointments
 WHERE patient_id = $1
 `
@@ -72,7 +157,7 @@ func (q *Queries) GetAppointmentBasedOnPatient(ctx context.Context, patientID in
 			&i.ID,
 			&i.CreatedAt,
 			&i.UpdatedAt,
-			&i.Appointment,
+			&i.DateOf,
 			&i.PatientID,
 			&i.Reasoning,
 		); err != nil {
@@ -90,13 +175,13 @@ func (q *Queries) GetAppointmentBasedOnPatient(ctx context.Context, patientID in
 }
 
 const getAppointmentsBasedOnDay = `-- name: GetAppointmentsBasedOnDay :many
-SELECT id, created_at, updated_at, appointment, patient_id, reasoning
+SELECT id, created_at, updated_at, date_of, patient_id, reasoning
 FROM appointments
-WHERE appointment = $1
+WHERE date_of = $1
 `
 
-func (q *Queries) GetAppointmentsBasedOnDay(ctx context.Context, appointment time.Time) ([]Appointment, error) {
-	rows, err := q.db.QueryContext(ctx, getAppointmentsBasedOnDay, appointment)
+func (q *Queries) GetAppointmentsBasedOnDay(ctx context.Context, dateOf time.Time) ([]Appointment, error) {
+	rows, err := q.db.QueryContext(ctx, getAppointmentsBasedOnDay, dateOf)
 	if err != nil {
 		return nil, err
 	}
@@ -108,7 +193,7 @@ func (q *Queries) GetAppointmentsBasedOnDay(ctx context.Context, appointment tim
 			&i.ID,
 			&i.CreatedAt,
 			&i.UpdatedAt,
-			&i.Appointment,
+			&i.DateOf,
 			&i.PatientID,
 			&i.Reasoning,
 		); err != nil {
@@ -127,16 +212,16 @@ func (q *Queries) GetAppointmentsBasedOnDay(ctx context.Context, appointment tim
 
 const updateAppointment = `-- name: UpdateAppointment :exec
 UPDATE appointments
-SET appointment = $2, updated_at = NOW()
+SET date_of = $2, updated_at = NOW()
 WHERE id = $1
 `
 
 type UpdateAppointmentParams struct {
-	ID          uuid.UUID
-	Appointment time.Time
+	ID     uuid.UUID
+	DateOf time.Time
 }
 
 func (q *Queries) UpdateAppointment(ctx context.Context, arg UpdateAppointmentParams) error {
-	_, err := q.db.ExecContext(ctx, updateAppointment, arg.ID, arg.Appointment)
+	_, err := q.db.ExecContext(ctx, updateAppointment, arg.ID, arg.DateOf)
 	return err
 }
