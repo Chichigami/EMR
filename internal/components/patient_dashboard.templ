@@ -7,7 +7,7 @@ import (
 )
 
 templ PatientDashboard(info models.PatientInfo) {
-	@patientAppointmentPage(info.Appointments)
+	@patientAppointmentTable(info.Appointments)
 	@patientChartPage(info.Charts)
 }
 
@@ -33,21 +33,44 @@ templ patientChartPage(charts []database.Chart) {
 	</ul>
 }
 
-templ patientAppointmentPage(appointments []database.Appointment) {
-	<ul>
-		for _, appointment := range appointments {
-			<div data-id={ appointment.ID.String() }>
-				<li>{ appointment.DateOf.Format("01/02/2006 03:04 PM") }</li>
-				<button>edit</button>
-				<button
-					hx-delete={ string(templ.SafeURL(fmt.Sprintf("/schedule/%v", appointment.ID))) }
-					hx-confirm="Are you sure?"
-					hx-target={ fmt.Sprintf("[data-id='%s']", appointment.ID.String()) }
-					hx-swap="delete"
-				>
-					Delete
-				</button>
-			</div>
-		}
-	</ul>
+templ patientAppointmentTable(appointments []database.Appointment) {
+	<style>
+	tr.htmx-swapping td {
+		opacity: 0;
+		transition: opacity 1s ease-out;
+	}	
+	</style>
+	<h3>
+		Appointments
+	</h3>
+	<table class="table delete-row-example">
+		<thead>
+			<tr>
+				<th>Date</th>
+				<th>Time</th>
+				<th>Reason</th>
+				<th>Edit</th>
+				<th>Delete</th>
+			</tr>
+		</thead>
+		<tbody hx-confirm="Are you sure?" hx-target="closest tr" hx-swap="outerHTML swap:1s">
+			for _, appointment := range appointments {
+				<tr>
+					<td>{ appointment.DateOf.Format("2006/01/02") }</td>
+					<td>{ appointment.DateOf.Format("T01:02") } </td>
+					<td>{ appointment.Reasoning.String }</td>
+					<td>
+						<button class="btn danger" hx-put={ string(templ.SafeURL(fmt.Sprintf("/schedule/%v", appointment.ID))) }>
+							Edit
+						</button>
+					</td>
+					<td>
+						<button class="btn danger" hx-delete={ string(templ.SafeURL(fmt.Sprintf("/schedule/%v", appointment.ID))) }>
+							Delete
+						</button>
+					</td>
+				</tr>
+			}
+		</tbody>
+	</table>
 }
