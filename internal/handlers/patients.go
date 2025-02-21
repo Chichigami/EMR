@@ -1,54 +1,47 @@
 package handlers
 
 import (
+	"database/sql"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
-	"strconv"
-	"strings"
 	"time"
 
+	"github.com/chichigami/EMR/internal/components"
 	"github.com/chichigami/EMR/internal/database"
 	"github.com/chichigami/EMR/internal/models"
 	"github.com/gin-gonic/gin"
 )
 
-func ConvertStringToDate(s string) (time.Time, error) {
-	//string to time.Time YYYYMMDD
-	//if s contains delimiters then split otherwise don't
-	splitted := strings.Split(s, "-")
-	formatted := fmt.Sprintf("%s%s%s", splitted[0], splitted[1], splitted[2])
-	fmt.Println(formatted)
-	if len(formatted) != 8 {
-		return time.Time{}, fmt.Errorf("need 8 numbers in YYYYMMDD format")
-	}
-	const shortForm = "20060102"
-	date, err := time.Parse(shortForm, formatted)
-	if err != nil {
-		return time.Time{}, err
-	}
-	return date, nil
-}
-
-// get patient data
+// get patient data and show dashboard of charts, appointments, etc
 //
 // GET
 func (h *HandlerConfig) HandlerPatientsRead(c *gin.Context) {
-	patientStr := c.Param(":id")
-	patientID32, err := strconv.ParseInt(patientStr, 10, 32)
-	if err != nil {
-		log.Fatalf("converting patient id string to int failed")
-	}
-	dbPatient, err := h.Config.Datebase.GetPatient(c, database.NullInt32(int32(patientID32)))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
-		})
+	id := c.Param("id")
+	patientID, err := ConvertStringToInt32(id)
+	dbPatient, err := h.Config.Database.GetPatient(c, patientID)
+	if errors.Is(err, sql.ErrNoRows) {
+		c.String(http.StatusOK, "Patient does not exist")
+		return
+	} else if err != nil {
+		log.Printf("get patient error: %s", err.Error())
 		return
 	}
-	c.JSON(400, gin.H{
-		"patient": dbPatient,
-	})
+
+	//go routine to fetch patient appointments and charts
+	//if err is no row then ignore
+	dbPatientAppt, err := h.Config.Database.GetAppointmentBasedOnPatient(c, int32(patientID))
+	dbPatientChart, err := h.Config.Database.GetPatientCharts(c, int32(patientID))
+
+	patientData := models.PatientInfo{
+		First_Name:   dbPatient.FirstName,
+		Last_Name:    dbPatient.LastName,
+		Patient_ID:   id,
+		Appointments: dbPatientAppt,
+		Charts:       dbPatientChart,
+	}
+	h.renderPatientDashbord(c, patientData)
 }
 
 // makes a new patient
@@ -63,62 +56,78 @@ func (h *HandlerConfig) HandlerPatientsCreate(c *gin.Context) {
 		return
 	}
 
-	date, err := ConvertStringToDate(param.DateOfBirth)
+	date, err := time.Parse("2006-01-02", param.DateOfBirth)
 	if err != nil {
 		log.Printf("Failed to convert date: input=%s, error=%v", param.DateOfBirth, err)
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "converting date error",
-		})
+		c.String(http.StatusInternalServerError, "converting date/time failed")
 		return
 	}
-	patient, err := h.Config.Datebase.CreatePatient(c, database.CreatePatientParams{
+	patient, err := h.Config.Database.CreatePatient(c, database.CreatePatientParams{
 		FirstName:            param.FirstName,
-		MiddleName:           database.NullStringCheck(param.MiddleName),
+		MiddleName:           NullString(param.MiddleName),
 		LastName:             param.LastName,
 		DateOfBirth:          date,
 		Sex:                  param.Sex,
 		Gender:               param.Gender,
-		SocialSecurityNumber: database.NullStringCheck(param.SocialSecurityNumber),
+		SocialSecurityNumber: NullString(param.SocialSecurityNumber),
 		Pharmacy:             param.Pharmacy,
-		Email:                database.NullStringCheck(param.Email),
+		Email:                NullString(param.Email),
 		LocationAddress:      param.LocationAddress,
 		ZipCode:              param.ZipCode,
-		CellPhoneNumber:      database.NullStringCheck(param.CellPhoneNumber),
-		HomePhoneNumber:      database.NullStringCheck(param.HomePhoneNumber),
-		MaritalStatus:        database.NullStringCheck(param.MaritalStatus),
-		Insurance:            database.NullStringCheck(param.Insurance),
-		PrimaryCareDoctor:    database.NullStringCheck(param.PrimaryCareDoctor),
-		ExtraNote:            database.NullStringCheck(param.ExtraNotes),
+		CellPhoneNumber:      NullString(param.CellPhoneNumber),
+		HomePhoneNumber:      NullString(param.HomePhoneNumber),
+		MaritalStatus:        NullString(param.MaritalStatus),
+		Insurance:            NullString(param.Insurance),
+		PrimaryCareDoctor:    NullString(param.PrimaryCareDoctor),
+		ExtraNote:            NullString(param.ExtraNotes),
 	})
 	if err != nil {
-		c.JSON(500, gin.H{
-			"err": err.Error(),
-		})
+		c.String(http.StatusInternalServerError, "making new patient failed")
 		return
 	}
 
-	c.JSON(200, gin.H{
+	//redirect to patient page? or something else
+	c.JSON(http.StatusCreated, gin.H{
 		"message":    "success",
 		"chart info": patient,
 	})
 }
 
 func (h *HandlerConfig) HandlerPatientsDelete(c *gin.Context) {
-	err := h.Config.Datebase.DeleteAllPatients(c)
+	id := c.Param("id")
+	patientID, err := ConvertStringToInt32(id)
 	if err != nil {
-		c.JSON(500, gin.H{
-			"err": err.Error(),
-		})
+		log.Println(err.Error())
+	}
+	err = h.Config.Database.DeletePatient(c, patientID)
+	if err != nil {
+		log.Printf("could not delete patient: %v\n", patientID)
+		c.String(http.StatusInternalServerError, "failed to delete patient")
 		return
 	}
-	c.JSON(200, gin.H{
-		"message": "patient reset",
-	})
+
+	c.Header("HX-Redirect", "/patients/deleted")
 }
 
-func (h *HandlerConfig) HandlerPatientsUpdate(c *gin.Context) {
-	//get patient data
-	//check which data collides
-	//update data
-	HandlerPlaceholder(c)
+func (h *HandlerConfig) HandlerPatientDeleteAll(c *gin.Context) {
+	err := h.Config.Database.DeleteAllPatients(c)
+	if err != nil {
+		c.String(http.StatusOK, "DELETED ALL PATIENTS")
+	}
+}
+
+func HandlerPatientDNE(c *gin.Context) {
+	c.String(http.StatusOK, "Patient does not exist")
+}
+
+func (h *HandlerConfig) renderPatientDashbord(c *gin.Context, info models.PatientInfo) {
+	page := components.Base(fmt.Sprintf("%s's dashboard", info.First_Name),
+		components.PatientNavbar(info.Last_Name, info.First_Name, info.Patient_ID),
+		components.PatientDashboard(info),
+		components.DefaultFooter())
+	c.Header("Content-Type", "text/html; charset=utf-8")
+	if err := page.Render(c, c.Writer); err != nil {
+		c.String(http.StatusInternalServerError, "Failed to render page: %v", err)
+		return
+	}
 }

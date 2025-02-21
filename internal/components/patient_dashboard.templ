@@ -20,7 +20,7 @@ templ PatientNavbar(last_name, first_name string, id string) {
 			<li><button hx-put={ string(templ.URL(fmt.Sprintf("/patients/%s", id))) } hx-target="#modal-container">Edit Patient</button></li>
 			<li><button hx-get={ string(templ.URL(fmt.Sprintf("/schedule/modal/%s", id))) } hx-target="#modal-container">Make Appointment</button></li>
 			<div id="modal-container"></div>
-			<li><button hx-delete={ string(templ.SafeURL(fmt.Sprintf("/patients/%s", id))) }>DELETE PATIENT</button></li>
+			<li><button hx-delete={ string(templ.SafeURL(fmt.Sprintf("/patients/%s", id))) } hx-confirm="Are you sure you?">DELETE PATIENT</button></li>
 		</ul>
 	</nav>
 }
