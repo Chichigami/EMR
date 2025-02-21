@@ -36,15 +36,17 @@ func (h *HandlerConfig) HandlerUsersCreate(c *gin.Context) {
 		})
 		return
 	}
-	if err := h.Config.Datebase.CreateUser(c.Request.Context(), account); err != nil {
+	if err := h.Config.Database.CreateUser(c.Request.Context(), account); err != nil {
 		log.Fatalf("User creation failed: %s", err.Error())
-		return
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
 	}
+	//expected
 	c.JSON(http.StatusOK, gin.H{
 		"message": "user created",
 		"account": param,
 	})
-	return
 }
 
 // receives a http POST request and verifies login
@@ -59,10 +61,10 @@ func (h *HandlerConfig) HandlerUsersRead(c *gin.Context) {
 		return
 	}
 
-	account, err := h.Config.Datebase.GetHashedPassword(c, param.Username)
+	account, err := h.Config.Database.GetAccount(c, param.Username)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "failed to verify username",
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "fetching user failed",
 		})
 		return
 	}
@@ -72,7 +74,18 @@ func (h *HandlerConfig) HandlerUsersRead(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "wrong password",
 		})
+		return
 	}
+
+	// token, err := auth.MakeJWT(account.ID, h.Config.JWTSecret, time.Hour)
+	// if err != nil {
+	// 	c.JSON(http.StatusBadRequest, gin.H{
+	// 		"error": "token gen failed",
+	// 	})
+	// 	return
+	// }
+
+	//c.SetCookie()
 	c.Header("HX-Redirect", "/dashboard")
 }
 
@@ -94,7 +107,7 @@ func (h *HandlerConfig) HandlerUsersUpdate(c *gin.Context) {
 		})
 		return
 	}
-	err = h.Config.Datebase.UpdateUserInfo(c, database.UpdateUserInfoParams{
+	err = h.Config.Database.UpdateUserInfo(c, database.UpdateUserInfoParams{
 		Username:       "get username from auth from cookie",
 		HashedPassword: hashed,
 		LastName:       param.Lastname,
@@ -109,25 +122,33 @@ func (h *HandlerConfig) HandlerUsersUpdate(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"message": "account updated",
 	})
-	return
 }
 
 // button request in account page
 //
 // deletes account
-func (h *HandlerConfig) HandlerUsersDelete(c *gin.Context) {
-	//check account owner?
-	//hx-confirm
-	//hx-delete
-	err := h.Config.Datebase.DeleteUser(c, "auth_connection_to_username")
+// func (h *HandlerConfig) HandlerUsersDelete(c *gin.Context) {
+// 	//check account owner?
+// 	//hx-confirm
+// 	//hx-delete
+// 	err := h.Config.Database.DeleteUser(c, "auth_connection_to_username")
+// 	if err != nil {
+// 		c.JSON(http.StatusInternalServerError, gin.H{
+// 			"error": err.Error(),
+// 		})
+// 		return
+// 	}
+
+// 	c.JSON(http.StatusOK, gin.H{
+// 		"message": "account deleted",
+// 	})
+// }
+
+func (h *HandlerConfig) HandlerDeleteAllUser(c *gin.Context) {
+	err := h.Config.Database.DeleteAllUsers(c)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
+		log.Println(err.Error())
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{
-		"message": "account deleted",
-	})
-	return
+	c.String(http.StatusOK, "deleted all users")
 }
