@@ -28,7 +28,7 @@ templ Appointment() {
 	</form>
 }
 
-templ ModalAppointment() {
+templ ModalAppointment(id string) {
 	<style>
 	.modal-overlay{
 		position: fixed;
@@ -55,12 +55,18 @@ templ ModalAppointment() {
 	>
 		<div class="modal-overlay" hx-trigger="click" hx-target="#modal-container" hx-get="/schedule/null">
 			<div class="modal-content" hx-trigger="click consume">
-				<label>Patient ID: </label>
-				<input type="text" class="form-control" name="patient_id" required/>
-				<label>Appointment date and time</label>
-				<input type="datetime-local" class="form-control" name="date_and_time" required/>
-				<label>Reason: </label>
-				<input type="text" class="form-control" name="reason" required/>
+				<div class="form-group">
+					<label>Patient ID: </label>
+					<input type="text" class="form-control" name="patient_id" value={ id } readonly/>
+				</div>
+				<div class="form-group">
+					<label>Appointment date and time</label>
+					<input type="datetime-local" class="form-control" name="date_and_time" required/>
+				</div>
+				<div class="form-group">
+					<label>Reason: </label>
+					<input type="text" class="form-control" name="reason" required/>
+				</div>
 				<button type="submit" class="btn primary">
 					Make appointment
 				</button>

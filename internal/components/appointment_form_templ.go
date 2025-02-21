@@ -37,7 +37,7 @@ func Appointment() templ.Component {
 	})
 }
 
-func ModalAppointment() templ.Component {
+func ModalAppointment(id string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -58,7 +58,20 @@ func ModalAppointment() templ.Component {
 			templ_7745c5c3_Var2 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<style>\n\t.modal-overlay{\n\t\tposition: fixed;\n\t\tleft: 0;\n\t\tright: 0;\n\t\ttop: 0;\n\t\tbottom: 0;\n\t\tz-index: 1;\n\t\tbackground-color: grey;\n\t}\n\t.modal-content{\n\t\tbackground-color: white;\n\t\tpadding: 20px;\n\t\twidth: 50%;\n\t\tborder: 1px solid black;\n\t\tmargin: 15% auto;\n\t}\n\t</style><form hx-post=\"/schedule/create\" hx-trigger=\"submit\" hx-headers=\"{&#34;Content-Type&#34;: &#34;application/json&#34;}\" hx-ext=\"json-enc\"><div class=\"modal-overlay\" hx-trigger=\"click\" hx-target=\"#modal-container\" hx-get=\"/schedule/null\"><div class=\"modal-content\" hx-trigger=\"click consume\"><label>Patient ID: </label> <input type=\"text\" class=\"form-control\" name=\"patient_id\" required> <label>Appointment date and time</label> <input type=\"datetime-local\" class=\"form-control\" name=\"date_and_time\" required> <label>Reason: </label> <input type=\"text\" class=\"form-control\" name=\"reason\" required> <button type=\"submit\" class=\"btn primary\">Make appointment</button></div></div></form>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<style>\n\t.modal-overlay{\n\t\tposition: fixed;\n\t\tleft: 0;\n\t\tright: 0;\n\t\ttop: 0;\n\t\tbottom: 0;\n\t\tz-index: 1;\n\t\tbackground-color: grey;\n\t}\n\t.modal-content{\n\t\tbackground-color: white;\n\t\tpadding: 20px;\n\t\twidth: 50%;\n\t\tborder: 1px solid black;\n\t\tmargin: 15% auto;\n\t}\n\t</style><form hx-post=\"/schedule/create\" hx-trigger=\"submit\" hx-headers=\"{&#34;Content-Type&#34;: &#34;application/json&#34;}\" hx-ext=\"json-enc\"><div class=\"modal-overlay\" hx-trigger=\"click\" hx-target=\"#modal-container\" hx-get=\"/schedule/null\"><div class=\"modal-content\" hx-trigger=\"click consume\"><div class=\"form-group\"><label>Patient ID: </label> <input type=\"text\" class=\"form-control\" name=\"patient_id\" value=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var3 string
+		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(id)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/appointment_form.templ`, Line: 60, Col: 73}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" readonly></div><div class=\"form-group\"><label>Appointment date and time</label> <input type=\"datetime-local\" class=\"form-control\" name=\"date_and_time\" required></div><div class=\"form-group\"><label>Reason: </label> <input type=\"text\" class=\"form-control\" name=\"reason\" required></div><button type=\"submit\" class=\"btn primary\">Make appointment</button></div></div></form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

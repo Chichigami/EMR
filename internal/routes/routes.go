@@ -67,7 +67,7 @@ func AddRoutes(r *gin.Engine, h *handlers.HandlerConfig) {
 
 	schedule := r.Group("/schedule")
 	{
-		schedule.GET("/modal", renderAppointmentModal)
+		schedule.GET("/modal/:id", renderAppointmentModal)
 		schedule.POST("/create", h.HandlerAppointmentsCreate) //schedule a patient
 		schedule.DELETE("/:id", h.HandlerAppointmentsDelete)  //delete a patient's appointment
 		schedule.GET("/null", nullModal)
@@ -103,7 +103,7 @@ func renderSchedulePage(c *gin.Context) {
 
 func renderAppointmentModal(c *gin.Context) {
 	c.Header("Content-Type", "text/html; charset=utf-8")
-	if err := components.Modal_Appointment().Render(c, c.Writer); err != nil {
+	if err := components.ModalAppointment(c.Param("id")).Render(c, c.Writer); err != nil {
 		c.String(http.StatusInternalServerError, "Failed to render page: %v", err)
 		return
 	}

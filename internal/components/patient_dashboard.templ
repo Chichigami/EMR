@@ -17,8 +17,8 @@ templ PatientNavbar(last_name, first_name string, id string) {
 		<ul class="nav-tabs">
 			<li>patient_dob</li>
 			<li>pcp</li>
-			<li>edit patient info</li>
-			<li><button hx-get="/schedule/modal" hx-target="#modal-container">Make new appointment</button></li>
+			<li><button hx-put={ string(templ.URL(fmt.Sprintf("/patients/%s", id))) } hx-target="#modal-container">Edit Patient</button></li>
+			<li><button hx-get={ string(templ.URL(fmt.Sprintf("/schedule/modal/%s", id))) } hx-target="#modal-container">Make Appointment</button></li>
 			<div id="modal-container"></div>
 			<li><button hx-delete={ string(templ.SafeURL(fmt.Sprintf("/patients/%s", id))) }>DELETE PATIENT</button></li>
 		</ul>
@@ -36,9 +36,18 @@ templ patientChartPage(charts []database.Chart) {
 templ patientAppointmentPage(appointments []database.Appointment) {
 	<ul>
 		for _, appointment := range appointments {
-			<li>{ appointment.DateOf.Format("01/02/2006 03:04 PM") }</li>
-			<button>edit</button>
-			<button hx-delete={ string(templ.SafeURL(fmt.Sprintf("/schedule/%v", appointment.ID))) } hx-confirm="Are you sure?">delete</button>
+			<div data-id={ appointment.ID.String() }>
+				<li>{ appointment.DateOf.Format("01/02/2006 03:04 PM") }</li>
+				<button>edit</button>
+				<button
+					hx-delete={ string(templ.SafeURL(fmt.Sprintf("/schedule/%v", appointment.ID))) }
+					hx-confirm="Are you sure?"
+					hx-target={ fmt.Sprintf("[data-id='%s']", appointment.ID.String()) }
+					hx-swap="delete"
+				>
+					Delete
+				</button>
+			</div>
 		}
 	</ul>
 }
