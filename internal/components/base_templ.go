@@ -44,7 +44,7 @@ func Base(title string, navbar templ.Component, body templ.Component, footer tem
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</title><link rel=\"icon\" href=\"/assets/favicon.ico\" type=\"image/x-icon\"><script src=\"/assets/htmx.min.js\"></script><script src=\"/assets/json-enc.js\"></script><script src=\"/assets/Sortable.min.js\"></script><link href=\"/assets/index.css\" rel=\"stylesheet\"></head><body>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</title><link rel=\"icon\" href=\"/assets/electrocardiogram-svgrepo-com.svg\" type=\"image/x-icon\"><script src=\"/assets/htmx.min.js\"></script><script src=\"/assets/json-enc.js\"></script><script src=\"/assets/Sortable.min.js\"></script><link href=\"/assets/index.css\" rel=\"stylesheet\"></head><body>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -97,20 +97,20 @@ func DefaultNavbar() templ.Component {
 			templ_7745c5c3_Var3 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<nav class=\"navbar\"><a href=\"/dashboard\" class=\"logo\">EMR</a><h3>Find Patient <span class=\"htmx-indicator\"><img src=\"/img/bars.svg\"> Searching...</span></h3><input class=\"form-control\" type=\"search\" name=\"search\" placeholder=\"Begin Typing To Search Users...\" hx-post=\"/patients/search\" hx-trigger=\"input changed delay:500ms, keyup[key==&#39;Enter&#39;], load\" hx-target=\"#search-results\" hx-indicator=\".htmx-indicator\"><form hx-get=\"/dashboard\" hx-trigger=\"change from:input[type=date]\" hx-target=\"body\"><input type=\"date\" name=\"date\" value=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<nav class=\"navbar\"><a href=\"/dashboard\" class=\"logo\"><img src=\"/assets/folder-svgrepo-com.svg\" href=\"/dashboard\" alt=\"Profile Icon\" width=\"24\" height=\"24\"></a> <input class=\"form-control\" type=\"search\" name=\"search\" placeholder=\"Search using ID or Name\" hx-post=\"/patients/search\" hx-trigger=\"input changed delay:500ms, keyup[key==&#39;Enter&#39;], load\" hx-target=\"#search-results\" hx-indicator=\".htmx-indicator\"><form hx-get=\"/dashboard\" hx-trigger=\"change from:input[type=date]\" hx-target=\"body\"><input type=\"date\" name=\"date\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(time.Now().Format("2006-01-02"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/base.templ`, Line: 53, Col: 73}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/base.templ`, Line: 49, Col: 73}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"></form><a>User icon</a></nav>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"></form><a href=\"/dashboard\"><img src=\"/assets/doctor-svgrepo-com.svg\" href=\"/dashboard\" alt=\"Profile Icon\" width=\"24\" height=\"24\"></a></nav>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
