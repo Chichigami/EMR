@@ -14,7 +14,7 @@ import (
 	"github.com/chichigami/EMR/internal/models"
 )
 
-func PatientDashboard(info models.PatientInfo) templ.Component {
+func PatientDashboard(p models.PatientProfile) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -35,11 +35,11 @@ func PatientDashboard(info models.PatientInfo) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = patientAppointmentTable(info.Appointments).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = patientAppointmentTable(p.Appointments).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = patientChartPage(info.Charts).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = patientChartPage(p.Charts).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -47,7 +47,7 @@ func PatientDashboard(info models.PatientInfo) templ.Component {
 	})
 }
 
-func PatientNavbar(last_name, first_name string, id string) templ.Component {
+func PatientNavbar(p models.PatientProfile) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -72,7 +72,7 @@ func PatientNavbar(last_name, first_name string, id string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var3 templ.SafeURL = templ.URL(fmt.Sprintf("/patients/%s", id))
+		var templ_7745c5c3_Var3 templ.SafeURL = templ.URL(fmt.Sprintf("/patients/%s", p.ID))
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(string(templ_7745c5c3_Var3)))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -82,9 +82,9 @@ func PatientNavbar(last_name, first_name string, id string) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var4 string
-		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%s, %s", last_name, first_name))
+		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%s, %s", p.Demographic.LastName, p.Demographic.FirstName))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/patient_dashboard.templ`, Line: 16, Col: 116}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/patient_dashboard.templ`, Line: 16, Col: 144}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
@@ -95,9 +95,9 @@ func PatientNavbar(last_name, first_name string, id string) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var5 string
-		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(string(templ.URL(fmt.Sprintf("/patients/%s", id))))
+		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(string(templ.URL(fmt.Sprintf("/patients/%s", p.ID))))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/patient_dashboard.templ`, Line: 20, Col: 74}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/patient_dashboard.templ`, Line: 20, Col: 76}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {
@@ -108,9 +108,9 @@ func PatientNavbar(last_name, first_name string, id string) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var6 string
-		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(string(templ.URL(fmt.Sprintf("/schedule/modal/%s", id))))
+		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(string(templ.URL(fmt.Sprintf("/schedule/modal/%s", p.ID))))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/patient_dashboard.templ`, Line: 21, Col: 80}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/patient_dashboard.templ`, Line: 21, Col: 82}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 		if templ_7745c5c3_Err != nil {
@@ -121,9 +121,9 @@ func PatientNavbar(last_name, first_name string, id string) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var7 string
-		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(string(templ.SafeURL(fmt.Sprintf("/patients/%s", id))))
+		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(string(templ.SafeURL(fmt.Sprintf("/patients/%s", p.ID))))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/patient_dashboard.templ`, Line: 23, Col: 81}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/patient_dashboard.templ`, Line: 23, Col: 83}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 		if templ_7745c5c3_Err != nil {
@@ -220,7 +220,7 @@ func patientAppointmentTable(appointments []database.Appointment) templ.Componen
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var11 string
-			templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(appointment.DateOf.Format("2006/01/02"))
+			templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(appointment.DateOf.Format("01/02/2006"))
 			if templ_7745c5c3_Err != nil {
 				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/patient_dashboard.templ`, Line: 59, Col: 50}
 			}
@@ -233,9 +233,9 @@ func patientAppointmentTable(appointments []database.Appointment) templ.Componen
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var12 string
-			templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(appointment.DateOf.Format("T01:02"))
+			templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(appointment.DateOf.Format("01:02"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/patient_dashboard.templ`, Line: 60, Col: 46}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/patient_dashboard.templ`, Line: 60, Col: 45}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 			if templ_7745c5c3_Err != nil {

@@ -6,21 +6,21 @@ import (
 	"github.com/chichigami/EMR/internal/models"
 )
 
-templ PatientDashboard(info models.PatientInfo) {
-	@patientAppointmentTable(info.Appointments)
-	@patientChartPage(info.Charts)
+templ PatientDashboard(p models.PatientProfile) {
+	@patientAppointmentTable(p.Appointments)
+	@patientChartPage(p.Charts)
 }
 
-templ PatientNavbar(last_name, first_name string, id string) {
+templ PatientNavbar(p models.PatientProfile) {
 	<nav class="navbar">
-		<a href={ templ.URL(fmt.Sprintf("/patients/%s", id)) } class="logo">{ fmt.Sprintf("%s, %s", last_name, first_name) }</a>
+		<a href={ templ.URL(fmt.Sprintf("/patients/%s", p.ID)) } class="logo">{ fmt.Sprintf("%s, %s", p.Demographic.LastName, p.Demographic.FirstName) }</a>
 		<ul class="nav-tabs">
 			<li>patient_dob</li>
 			<li>pcp</li>
-			<li><button hx-put={ string(templ.URL(fmt.Sprintf("/patients/%s", id))) } hx-target="#modal-container">Edit Patient</button></li>
-			<li><button hx-get={ string(templ.URL(fmt.Sprintf("/schedule/modal/%s", id))) } hx-target="#modal-container">Make Appointment</button></li>
+			<li><button hx-put={ string(templ.URL(fmt.Sprintf("/patients/%s", p.ID))) } hx-target="#modal-container">Edit Patient</button></li>
+			<li><button hx-get={ string(templ.URL(fmt.Sprintf("/schedule/modal/%s", p.ID))) } hx-target="#modal-container">Make Appointment</button></li>
 			<div id="modal-container"></div>
-			<li><button hx-delete={ string(templ.SafeURL(fmt.Sprintf("/patients/%s", id))) } hx-confirm="Are you sure you?">DELETE PATIENT</button></li>
+			<li><button hx-delete={ string(templ.SafeURL(fmt.Sprintf("/patients/%s", p.ID))) } hx-confirm="Are you sure you?">DELETE PATIENT</button></li>
 		</ul>
 	</nav>
 }
@@ -56,8 +56,8 @@ templ patientAppointmentTable(appointments []database.Appointment) {
 		<tbody hx-confirm="Are you sure?" hx-target="closest tr" hx-swap="outerHTML swap:1s">
 			for _, appointment := range appointments {
 				<tr>
-					<td>{ appointment.DateOf.Format("2006/01/02") }</td>
-					<td>{ appointment.DateOf.Format("T01:02") } </td>
+					<td>{ appointment.DateOf.Format("01/02/2006") }</td>
+					<td>{ appointment.DateOf.Format("01:02") } </td>
 					<td>{ appointment.Reasoning.String }</td>
 					<td>
 						<button class="btn danger" hx-put={ string(templ.SafeURL(fmt.Sprintf("/schedule/%v", appointment.ID))) }>

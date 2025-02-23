@@ -34,10 +34,9 @@ func (h *HandlerConfig) HandlerPatientsRead(c *gin.Context) {
 	dbPatientAppt, err := h.Config.Database.GetAppointmentBasedOnPatient(c, int32(patientID))
 	dbPatientChart, err := h.Config.Database.GetPatientCharts(c, int32(patientID))
 
-	patientData := models.PatientInfo{
-		First_Name:   dbPatient.FirstName,
-		Last_Name:    dbPatient.LastName,
-		Patient_ID:   id,
+	patientData := models.PatientProfile{
+		Demographic:  dbPatient,
+		ID:           id,
 		Appointments: dbPatientAppt,
 		Charts:       dbPatientChart,
 	}
@@ -120,10 +119,10 @@ func HandlerPatientDNE(c *gin.Context) {
 	c.String(http.StatusOK, "Patient does not exist")
 }
 
-func (h *HandlerConfig) renderPatientDashbord(c *gin.Context, info models.PatientInfo) {
-	page := components.Base(fmt.Sprintf("%s's dashboard", info.First_Name),
-		components.PatientNavbar(info.Last_Name, info.First_Name, info.Patient_ID),
-		components.PatientDashboard(info),
+func (h *HandlerConfig) renderPatientDashbord(c *gin.Context, patient models.PatientProfile) {
+	page := components.Base(fmt.Sprintf("%s, %s (%s)'s Profile", patient.Demographic.LastName, patient.Demographic.FirstName, patient.ID),
+		components.PatientNavbar(patient),
+		components.PatientDashboard(patient),
 		components.DefaultFooter())
 	c.Header("Content-Type", "text/html; charset=utf-8")
 	if err := page.Render(c, c.Writer); err != nil {
