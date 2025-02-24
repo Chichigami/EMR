@@ -30,10 +30,9 @@ type PatientCache struct {
 	LastAccessTime time.Time
 }
 
-type PatientInfo struct {
-	First_Name   string
-	Last_Name    string
-	Patient_ID   string
+type PatientProfile struct {
+	Demographic  database.Patient
+	ID           string
 	Appointments []database.Appointment
 	Charts       []database.Chart
 }
