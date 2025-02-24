@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/chichigami/EMR/internal/database"
 	"github.com/chichigami/EMR/internal/models"
+	_ "github.com/google/uuid"
 )
 
 templ PatientDashboard(p models.PatientProfile) {
@@ -43,14 +44,49 @@ templ PatientNavbar(p models.PatientProfile) {
 }
 
 templ patientChartPage(id string, charts []database.Chart) {
+	<style>
+	tr.htmx-swapping td {
+		opacity: 0;
+		transition: opacity 1s ease-out;
+	}	
+	</style>
 	<h3>
 		Charts
 	</h3>
-	<ul>
-		for _, chart := range charts {
-			<li><button>{ chart.ID.String() }</button></li>
-		}
-	</ul>
+	<table class="table delete-row-example">
+		<thead>
+			<tr>
+				<th>Chart</th>
+				<th>Open</th>
+				<th>Delete</th>
+			</tr>
+		</thead>
+		<tbody>
+			for _, chart := range charts {
+				<tr>
+					<td>{ chart.ID.String() }</td>
+					<td>
+						<a href={ templ.SafeURL(fmt.Sprintf("/patients/%s/charts/%s", id, chart.ID.String())) } target="_blank">
+							<button class="btn primary">
+								Open
+							</button>
+						</a>
+					</td>
+					<td>
+						<button
+							hx-confirm="Are you sure?"
+							hx-target="closest tr"
+							hx-swap="outerHTML swap:1s"
+							class="btn danger"
+							hx-delete={ string(templ.SafeURL(fmt.Sprintf("/patients/%s/charts/%s", id, chart.ID))) }
+						>
+							Delete
+						</button>
+					</td>
+				</tr>
+			}
+		</tbody>
+	</table>
 	<button
 		hx-post={ string(templ.SafeURL(fmt.Sprintf("/patients/%s/charts/new", id))) }
 		hx-on::after-request="window.open(event.detail.xhr.responseText, '_blank')"
