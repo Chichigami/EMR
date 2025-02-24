@@ -1,23 +1,59 @@
 package handlers
 
-import "github.com/gin-gonic/gin"
+import (
+	"fmt"
+	"log"
+	"net/http"
+
+	"github.com/chichigami/EMR/internal/components"
+	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
+)
 
 func (h *HandlerConfig) HandlerChartsCreate(c *gin.Context) {
-	//wait for request from front end. make new chart.
-	HandlerPlaceholder(c)
+	id := c.Param("id")
+	patientID, err := ConvertStringToInt32(id)
+	if err != nil {
+		log.Println(err.Error())
+	}
+	dbChart, err := h.Config.Database.CreateChart(c, patientID)
+	if err != nil {
+		log.Println(err)
+	}
+	c.String(http.StatusOK, fmt.Sprintf("/patients/%s/charts/%s", id, dbChart.ID))
 }
 
-func (h *HandlerConfig) HandlerChartsRead(c *gin.Context) {
-	//get chart based on ID
-	HandlerPlaceholder(c)
+func (h *HandlerConfig) HandlerChartsGet(c *gin.Context) {
+	param := c.Param("uuid")
+	//for when i build the charts
+	_, err := h.Config.Database.GetChart(c, uuid.MustParse(param))
+	if err != nil {
+		log.Println(err)
+	}
+	page := components.Base("Some person's chart", nil, nil, components.ChartFooter(param, "dr. feng"))
+	c.Header("Content-Type", "text/html; charset=utf-8")
+	if err := page.Render(c, c.Writer); err != nil {
+		c.String(http.StatusInternalServerError, "Failed to render page: %v", err)
+		return
+	}
 }
 
-func (h *HandlerConfig) HandlerChartsUpdate(c *gin.Context) {
-	//should receive a request every chart completion? or every minute.
-	HandlerPlaceholder(c)
-}
+// func (h *HandlerConfig) HandlerChartsRead(c *gin.Context) {
+// 	//get chart based on ID
+// 	HandlerPlaceholder(c)
+// }
+
+// func (h *HandlerConfig) HandlerChartsUpdate(c *gin.Context) {
+// 	//should receive a request every chart completion? or every minute.
+// 	HandlerPlaceholder(c)
+// }
 
 func (h *HandlerConfig) HandlerChartsDelete(c *gin.Context) {
-	//delete chart based on id
-	HandlerPlaceholder(c)
+	param := c.Query("id")
+	id := uuid.MustParse(param)
+	err := h.Config.Database.DeleteChart(c, id)
+	if err != nil {
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
 }

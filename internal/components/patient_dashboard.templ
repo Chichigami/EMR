@@ -8,29 +8,57 @@ import (
 
 templ PatientDashboard(p models.PatientProfile) {
 	@patientAppointmentTable(p.Appointments)
-	@patientChartPage(p.Charts)
+	@patientChartPage(p.ID, p.Charts)
 }
 
 templ PatientNavbar(p models.PatientProfile) {
 	<nav class="navbar">
-		<a href={ templ.URL(fmt.Sprintf("/patients/%s", p.ID)) } class="logo">{ fmt.Sprintf("%s, %s", p.Demographic.LastName, p.Demographic.FirstName) }</a>
+		<a
+			href={ templ.URL(fmt.Sprintf("/patients/%s", p.ID)) }
+			class="logo"
+		>
+			{ fmt.Sprintf("%s, %s", p.Demographic.LastName, p.Demographic.FirstName) }
+		</a>
 		<ul class="nav-tabs">
 			<li>patient_dob</li>
 			<li>pcp</li>
-			<li><button hx-put={ string(templ.URL(fmt.Sprintf("/patients/%s", p.ID))) } hx-target="#modal-container">Edit Patient</button></li>
-			<li><button hx-get={ string(templ.URL(fmt.Sprintf("/schedule/modal/%s", p.ID))) } hx-target="#modal-container">Make Appointment</button></li>
+			<li>
+				<button hx-put={ string(templ.URL(fmt.Sprintf("/patients/%s", p.ID))) } hx-target="#modal-container">
+					Edit Patient
+				</button>
+			</li>
+			<li>
+				<button hx-get={ string(templ.URL(fmt.Sprintf("/schedule/modal/%s", p.ID))) } hx-target="#modal-container">
+					Make Appointment
+				</button>
+			</li>
 			<div id="modal-container"></div>
-			<li><button hx-delete={ string(templ.SafeURL(fmt.Sprintf("/patients/%s", p.ID))) } hx-confirm="Are you sure you?">DELETE PATIENT</button></li>
+			<li>
+				<button hx-delete={ string(templ.SafeURL(fmt.Sprintf("/patients/%s", p.ID))) } hx-confirm="Are you sure you?">
+					DELETE PATIENT
+				</button>
+			</li>
 		</ul>
 	</nav>
 }
 
-templ patientChartPage(charts []database.Chart) {
+templ patientChartPage(id string, charts []database.Chart) {
+	<h3>
+		Charts
+	</h3>
 	<ul>
 		for _, chart := range charts {
 			<li><button>{ chart.ID.String() }</button></li>
 		}
 	</ul>
+	<button
+		hx-post={ string(templ.SafeURL(fmt.Sprintf("/patients/%s/charts/new", id))) }
+		hx-on::after-request="window.open(event.detail.xhr.responseText, '_blank')"
+		hx-target="body"
+		hx-swap="none"
+	>
+		New chart
+	</button>
 }
 
 templ patientAppointmentTable(appointments []database.Appointment) {

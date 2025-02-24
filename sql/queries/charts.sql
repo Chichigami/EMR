@@ -6,6 +6,10 @@ INSERT INTO charts (
 )
 RETURNING *;
 
+-- name: GetChart :one
+SELECT *
+FROM charts
+WHERE id = $1;
 
 -- name: UpdateChart :exec
 UPDATE charts 
@@ -16,3 +20,7 @@ WHERE patient_id = $1;
 SELECT *
 FROM charts
 WHERE patient_id = $1;
+
+-- name: DeleteChart :exec
+DELETE FROM charts
+WHERE id = $1;

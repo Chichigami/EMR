@@ -8,6 +8,7 @@ package database
 import (
 	"context"
 
+	"github.com/google/uuid"
 	"github.com/sqlc-dev/pqtype"
 )
 
@@ -22,6 +23,36 @@ RETURNING id, created_at, updated_at, patient_id, note, signed_status
 
 func (q *Queries) CreateChart(ctx context.Context, patientID int32) (Chart, error) {
 	row := q.db.QueryRowContext(ctx, createChart, patientID)
+	var i Chart
+	err := row.Scan(
+		&i.ID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.PatientID,
+		&i.Note,
+		&i.SignedStatus,
+	)
+	return i, err
+}
+
+const deleteChart = `-- name: DeleteChart :exec
+DELETE FROM charts
+WHERE id = $1
+`
+
+func (q *Queries) DeleteChart(ctx context.Context, id uuid.UUID) error {
+	_, err := q.db.ExecContext(ctx, deleteChart, id)
+	return err
+}
+
+const getChart = `-- name: GetChart :one
+SELECT id, created_at, updated_at, patient_id, note, signed_status
+FROM charts
+WHERE id = $1
+`
+
+func (q *Queries) GetChart(ctx context.Context, id uuid.UUID) (Chart, error) {
+	row := q.db.QueryRowContext(ctx, getChart, id)
 	var i Chart
 	err := row.Scan(
 		&i.ID,

@@ -1,10 +1,16 @@
 package components
 
-templ DoctorFooter(doctor string) {
+templ ChartFooter(chartID string, doctor string) {
 	<footer class="footer">
+		<h6>{ chartID }</h6>
 		<p>
 			<a>{ doctor } </a>
-			<button hx-put="/patients/charts">
+			<button
+				hx-put="/patients/charts"
+				hx-target="#chart-body"
+				hx-headers='{"Content-Type": "application/json"}'
+				hx-ext="json-enc"
+			>
 				Save Chart
 			</button>
 		</p>
