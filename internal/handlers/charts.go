@@ -20,6 +20,7 @@ func (h *HandlerConfig) HandlerChartsCreate(c *gin.Context) {
 	if err != nil {
 		log.Println(err)
 	}
+	//maybe will redirect page instead. need to somehow refresh chart table partial div and return that string
 	c.String(http.StatusOK, fmt.Sprintf("/patients/%s/charts/%s", id, dbChart.ID))
 }
 
@@ -30,7 +31,7 @@ func (h *HandlerConfig) HandlerChartsGet(c *gin.Context) {
 	if err != nil {
 		log.Println(err)
 	}
-	page := components.Base("Some person's chart", nil, nil, components.ChartFooter(param, "dr. feng"))
+	page := components.Base("Some person's chart", components.DefaultNavbar(), nil, components.ChartFooter(param, "dr. feng"))
 	c.Header("Content-Type", "text/html; charset=utf-8")
 	if err := page.Render(c, c.Writer); err != nil {
 		c.String(http.StatusInternalServerError, "Failed to render page: %v", err)
@@ -38,20 +39,14 @@ func (h *HandlerConfig) HandlerChartsGet(c *gin.Context) {
 	}
 }
 
-// func (h *HandlerConfig) HandlerChartsRead(c *gin.Context) {
-// 	//get chart based on ID
-// 	HandlerPlaceholder(c)
-// }
-
 // func (h *HandlerConfig) HandlerChartsUpdate(c *gin.Context) {
 // 	//should receive a request every chart completion? or every minute.
 // 	HandlerPlaceholder(c)
 // }
 
 func (h *HandlerConfig) HandlerChartsDelete(c *gin.Context) {
-	param := c.Query("id")
-	id := uuid.MustParse(param)
-	err := h.Config.Database.DeleteChart(c, id)
+	param := c.Param("uuid")
+	err := h.Config.Database.DeleteChart(c, uuid.MustParse(param))
 	if err != nil {
 		c.String(http.StatusInternalServerError, err.Error())
 		return
