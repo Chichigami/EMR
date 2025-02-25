@@ -22,7 +22,9 @@ templ Base(title string, navbar templ.Component, body templ.Component, footer te
 			if navbar != nil {
 				@navbar
 			}
-			@body
+			if body != nil {
+				@body
+			}
 		</body>
 		if footer != nil {
 			@footer
@@ -45,7 +47,12 @@ templ DefaultNavbar() {
 			hx-target="#search-results"
 			hx-indicator=".htmx-indicator"
 		/>
-		<form hx-get="/dashboard" hx-trigger="change from:input[type=date]" hx-target="body">
+		<form
+			hx-get="/dashboard"
+			hx-trigger="change"
+			hx-target="body"
+			id="navbar"
+		>
 			<input type="date" name="date" value={ time.Now().Format("2006-01-02") }/>
 		</form>
 		<a href="/dashboard">
