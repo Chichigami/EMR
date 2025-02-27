@@ -8,8 +8,6 @@ package components
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-import "time"
-
 func Base(title string, navbar templ.Component, body templ.Component, footer templ.Component) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -38,13 +36,13 @@ func Base(title string, navbar templ.Component, body templ.Component, footer tem
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/base.templ`, Line: 13, Col: 17}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/base.templ`, Line: 11, Col: 17}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</title><link rel=\"icon\" href=\"/assets/electrocardiogram-svgrepo-com.svg\" type=\"image/x-icon\"><script src=\"/assets/htmx.min.js\"></script><script src=\"/assets/json-enc.js\"></script><script src=\"/assets/Sortable.min.js\"></script><link href=\"/assets/index.css\" rel=\"stylesheet\"></head><body>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</title><link rel=\"icon\" href=\"/assets/electrocardiogram-svgrepo-com.svg\" type=\"image/x-icon\"><script src=\"/assets/htmx.min.js\"></script><script src=\"/assets/json-enc.js\"></script><script src=\"/assets/Sortable.min.js\"></script><link href=\"/assets/index.css\" rel=\"stylesheet\"></head><body><nav class=\"navbar\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -53,6 +51,10 @@ func Base(title string, navbar templ.Component, body templ.Component, footer tem
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</nav>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
 		}
 		if body != nil {
 			templ_7745c5c3_Err = body.Render(ctx, templ_7745c5c3_Buffer)
@@ -78,7 +80,7 @@ func Base(title string, navbar templ.Component, body templ.Component, footer tem
 	})
 }
 
-func DefaultNavbar() templ.Component {
+func DefaultNavbar(date string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -99,20 +101,20 @@ func DefaultNavbar() templ.Component {
 			templ_7745c5c3_Var3 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<nav class=\"navbar\"><a href=\"/dashboard\" class=\"logo\"><img src=\"/assets/folder-svgrepo-com.svg\" href=\"/dashboard\" alt=\"Profile Icon\" width=\"24\" height=\"24\"></a> <input class=\"form-control\" type=\"search\" name=\"search\" placeholder=\"Search using ID or Name\" hx-post=\"/patients/search\" hx-trigger=\"input changed delay:500ms, keyup[key==&#39;Enter&#39;], load\" hx-target=\"#search-results\" hx-indicator=\".htmx-indicator\"><form hx-get=\"/dashboard\" hx-trigger=\"change\" hx-target=\"body\" id=\"navbar\"><input type=\"date\" name=\"date\" value=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div hx-boost=\"true\"><a href=\"/dashboard\" class=\"logo\"><img src=\"/assets/folder-svgrepo-com.svg\" href=\"/dashboard\" alt=\"Profile Icon\" width=\"24\" height=\"24\"></a></div><input class=\"form-control\" type=\"search\" name=\"search\" placeholder=\"Search using ID or Name\" hx-post=\"/patients/search\" hx-trigger=\"input changed delay:500ms, keyup[key==&#39;Enter&#39;], load\" hx-target=\"#search-results\" hx-indicator=\".htmx-indicator\"><form hx-get=\"/dashboard\" hx-target=\"body\" hx-push-url=\"true\" hx-trigger=\"change\"><input type=\"date\" name=\"date\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var4 string
-		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(time.Now().Format("2006-01-02"))
+		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(date)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/base.templ`, Line: 56, Col: 73}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/base.templ`, Line: 57, Col: 45}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"></form><a href=\"/dashboard\"><img src=\"/assets/doctor-svgrepo-com.svg\" href=\"/dashboard\" alt=\"Profile Icon\" width=\"24\" height=\"24\"></a></nav>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"></form><div hx-boost=\"true\"><a href=\"/dashboard\"><img src=\"/assets/doctor-svgrepo-com.svg\" href=\"/dashboard\" alt=\"Profile Icon\" width=\"24\" height=\"24\"></a></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -141,7 +143,7 @@ func DefaultFooter() templ.Component {
 			templ_7745c5c3_Var5 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<footer class=\"footer\"><p>Contact me: <a href=\"mailto:g.feng.work@gmail.com\">g.feng.work@gmail.com</a></p><p><a href=\"https://github.com/Chichigami\" target=\"_blank\" rel=\"noopener noreferrer\">GitHub</a> | <a href=\"https://www.linkedin.com/in/gary-feng-847156241/\" target=\"_blank\" rel=\"noopener noreferrer\">LinkedIn</a> | <a href=\"https://www.boot.dev/u/chichigami\" target=\"_blank\" rel=\"noopener noreferrer\">Boot.dev</a></p></footer>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<footer class=\"footer\"><h6><p>Contact me: <a href=\"mailto:g.feng.work@gmail.com\">g.feng.work@gmail.com</a></p><p><a href=\"https://github.com/Chichigami\" target=\"_blank\" rel=\"noopener noreferrer\">GitHub</a> | <a href=\"https://www.linkedin.com/in/gary-feng-847156241/\" target=\"_blank\" rel=\"noopener noreferrer\">LinkedIn</a> | <a href=\"https://www.boot.dev/u/chichigami\" target=\"_blank\" rel=\"noopener noreferrer\">Boot.dev</a></p></h6></footer>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
