@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
@@ -15,126 +16,92 @@ func AddRoutes(r *gin.Engine, h *handlers.HandlerConfig) {
 		c.Status(http.StatusOK)
 	})
 
-	r.GET("/ping", func(c *gin.Context) {
-		c.Status(http.StatusOK)
+	r.GET("/", func(c *gin.Context) { //default view => login page
+		handlers.RenderView(c, "EMR Login", nil, components.Login(), components.DefaultFooter())
 	})
 
-	r.GET("/graceful", func(c *gin.Context) {
-		c.String(http.StatusOK, "Ping received! Processing...")
-		time.Sleep(2 * time.Second)
-		c.String(http.StatusOK, "Ping completed!")
+	r.GET("/test", func(c *gin.Context) {
+		handlers.RenderView(c,
+			"test",
+			components.DefaultNavbar(time.Now().Format(time.DateOnly)),
+			components.Test_Dashboard(time.Now().Format(time.DateOnly)),
+			components.DefaultFooter())
 	})
 
-	//start of views
-	r.GET("/", renderLoginView)
-	r.GET("/patients/new", renderCreatePatientView)
-	r.GET("/schedule", renderScheduleView)
-	r.GET("/frontdesk", renderFrontDeskView)
-	r.GET("/test", renderTestView)
-
-	//start of api endpoints
-	login := r.Group("/login")
+	user := r.Group("/user")
 	{
-		login.GET("", h.HandlerUsersCreate) //create new login if admin auth
-		login.POST("", h.HandlerUsersRead)  //wait for login info, verifies
-		login.PUT("", h.HandlerUsersUpdate) //update login
+		user.GET("", h.HandlerUsersCreate)
+		user.POST("", h.HandlerUsersRead)
+		user.PUT("", h.HandlerUsersUpdate)
 		//login.DELETE("", h.HandlerUsersDelete) //delete login, need admin priv
-		login.DELETE("", h.HandlerDeleteAllUser)
+		user.DELETE("", h.HandlerDeleteAllUser)
+		user.GET("menu", h.RenderUserMenu)
+		user.POST("/logout", handlers.HandlerUserLogout)
 	}
 
 	dashboard := r.Group("/dashboard")
 	{
 		dashboard.GET("", h.HandlerDashboard)
+		dashboard.PUT("/test", func(ctx *gin.Context) {
+			type Moved struct {
+				ID   string
+				From string
+				To   string
+			}
+			var move Moved
+			if err := ctx.ShouldBindJSON(&move); err != nil {
+				fmt.Println(move)
+			}
+		})
 		// 	dashboard.POST("*date/items", h.HandlerDashboardUpdate)
 	}
 
 	patients := r.Group("/patients")
 	{
-		patients.POST("/create", h.HandlerPatientsCreate) //add new patient
-		patients.GET("/:id", h.HandlerPatientsRead)       //show patient based on id
-		//patients.PUT("/:id", h.HandlerPatientsUpdate)     //update patient info
-		patients.DELETE("/:id", h.HandlerPatientsDelete) //delete existing patient, need admin perm
-		//patients.GET("/:id", handlerPatientQuery)     //query for patient based on patient id, name, dob
+		patients.GET("/new", func(c *gin.Context) {
+			handlers.RenderView(c, "New Patient", components.DefaultNavbar(time.Now().Format(time.DateOnly)), components.PatientForm(), components.DefaultFooter())
+		})
+		patients.POST("/create", h.HandlerPatientsCreate)
+		patients.GET("/:id", h.HandlerPatientsRead)
+		//patients.PUT("/:id", h.HandlerPatientsUpdate)
+		patients.DELETE("/:id", h.HandlerPatientsDelete)
+		//patients.GET("/:id", handlerPatientQuery)
 		patients.GET("/dne", handlers.HandlerPatientDNE)
 		patients.POST("/danger/delete", h.HandlerPatientDeleteAll)
-		patients.GET("/deleted", renderDeleted)
+		patients.GET("/deleted", handlers.RenderDeletedView)
 	}
 
 	charts := patients.Group("/:id/charts")
 	{
-		charts.POST("/new", h.HandlerChartsCreate) //make new chart for patient
-		charts.GET("/:uuid", h.HandlerChartsGet)   //show chart info
-		// charts.PUT("/:id", h.HandlerChartsUpdate)    //update chart
-		// charts.DELETE("/:id", h.HandlerChartsDelete) //delete chart
+		charts.POST("/new", h.HandlerChartsCreate)
+		charts.GET("/:uuid", h.HandlerChartsGet)
+		charts.PUT("/:uuid", h.HandlerChartsUpdate)
+		charts.DELETE("/:uuid", h.HandlerChartsDelete)
 	}
 
 	schedule := r.Group("/schedule")
 	{
-		schedule.GET("/modal/:id", renderAppointmentModal)
+		schedule.GET("", func(c *gin.Context) {
+			handlers.RenderView(c, "New Appointment", components.DefaultNavbar(time.Now().Format("2006-01-02")), components.Appointment(), components.DefaultFooter())
+		})
+		schedule.GET("/modal/:id", handlers.RenderAppointmentModal)
 		schedule.PUT("/:id", h.HandlerAppointmentsUpdate)
-		schedule.POST("/create", h.HandlerAppointmentsCreate) //schedule a patient
-		schedule.DELETE("/:id", h.HandlerAppointmentsDelete)  //delete a patient's appointment
-		schedule.GET("/null", nullModal)
+		schedule.POST("/create", h.HandlerAppointmentsCreate)
+		schedule.DELETE("/:id", h.HandlerAppointmentsDelete)
+		schedule.GET("/null", func(c *gin.Context) { //there should be another way to do this.
+			c.String(http.StatusOK, "")
+		})
 	}
-}
 
-func renderTestView(c *gin.Context) {
-	page := components.Base("New Patient", nil, nil, components.ChartFooter("2138192012314-412412481243-123123", "dr. feng"))
-	c.Header("Content-Type", "text/html; charset=utf-8")
-	if err := page.Render(c, c.Writer); err != nil {
-		c.String(http.StatusInternalServerError, "Failed to render page: %v", err)
-		return
+	healthz := r.Group("/healthz")
+	{
+		healthz.GET("", func(c *gin.Context) {
+			c.Status(http.StatusOK)
+		})
+		healthz.GET("/graceful", func(c *gin.Context) {
+			c.String(http.StatusOK, "Ping received! Processing...")
+			time.Sleep(2 * time.Second)
+			c.String(http.StatusOK, "Ping completed!")
+		})
 	}
-}
-
-func renderCreatePatientView(c *gin.Context) {
-	page := components.Base("New Patient", components.DefaultNavbar(), components.PatientForm(), components.DefaultFooter())
-	c.Header("Content-Type", "text/html; charset=utf-8")
-	if err := page.Render(c, c.Writer); err != nil {
-		c.String(http.StatusInternalServerError, "Failed to render page: %v", err)
-		return
-	}
-}
-
-func renderFrontDeskView(c *gin.Context) {
-	page := components.Base("EMR Frontdesk", components.DefaultNavbar(), nil, components.DefaultFooter())
-	c.Header("Content-Type", "text/html; charset=utf-8")
-	if err := page.Render(c, c.Writer); err != nil {
-		c.String(http.StatusInternalServerError, "Failed to render page: %v", err)
-		return
-	}
-}
-
-func renderLoginView(c *gin.Context) {
-	page := components.Base("EMR Login", nil, components.Login(), components.DefaultFooter())
-	c.Header("Content-Type", "text/html; charset=utf-8")
-	if err := page.Render(c, c.Writer); err != nil {
-		c.String(http.StatusInternalServerError, "Failed to render page: %v", err)
-		return
-	}
-}
-
-func renderScheduleView(c *gin.Context) {
-	page := components.Base("New Appointment", components.DefaultNavbar(), components.Appointment(), components.DefaultFooter())
-	c.Header("Content-Type", "text/html; charset=utf-8")
-	if err := page.Render(c, c.Writer); err != nil {
-		c.String(http.StatusInternalServerError, "Failed to render page: %v", err)
-		return
-	}
-}
-
-func renderAppointmentModal(c *gin.Context) {
-	c.Header("Content-Type", "text/html; charset=utf-8")
-	if err := components.ModalAppointment(c.Param("id")).Render(c, c.Writer); err != nil {
-		c.String(http.StatusInternalServerError, "Failed to render page: %v", err)
-		return
-	}
-}
-
-func renderDeleted(c *gin.Context) {
-	c.String(200, "Patient deleted")
-}
-
-func nullModal(c *gin.Context) {
-	c.String(http.StatusOK, "")
 }
