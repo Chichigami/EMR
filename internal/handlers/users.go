@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/chichigami/EMR/internal/auth"
+	"github.com/chichigami/EMR/internal/components"
 	"github.com/chichigami/EMR/internal/database"
 	"github.com/chichigami/EMR/internal/models"
 	"github.com/gin-gonic/gin"
@@ -151,4 +152,17 @@ func (h *HandlerConfig) HandlerDeleteAllUser(c *gin.Context) {
 		return
 	}
 	c.String(http.StatusOK, "deleted all users")
+}
+
+func (h *HandlerConfig) RenderUserMenu(c *gin.Context) {
+	c.Header("Content-Type", "text/html")
+	if err := components.UserMenu().Render(c, c.Writer); err != nil {
+		log.Printf("user menu swap failed %v", err)
+	}
+}
+
+func HandlerUserLogout(c *gin.Context) {
+	c.SetCookie("Authorization", "", -1, "/", "", false, true)
+	c.Header("HX-Redirect", "/")
+	c.Status(http.StatusNoContent)
 }

@@ -12,8 +12,8 @@ h3,
 h4,
 h5,
 h6 {
-    margin-top: 24px;
-    margin-bottom: 16px;
+    font-weight: normal;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.2);
 }
 
 h1 {
@@ -21,7 +21,7 @@ h1 {
 }
 
 h2 {
-    font-size: 1.5em;
+    font-size: 1.5em;   
 }
 
 h3 {
@@ -31,7 +31,7 @@ h3 {
 h4,
 h5,
 h6 {
-    font-size: 1em;
+    font-size: 0.8em;
 }
 
 
@@ -92,4 +92,57 @@ h6 {
 .footer a:hover {
     color: #ffcc00;
     text-decoration: underline;
+}
+
+.profile-container {
+    position: relative;
+    display: inline-block;
+}
+
+.profile-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.profile-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+}
+
+.dropdown-menu {
+    position: absolute;
+    right: 0;
+    top: 40px;
+    background: white;
+    border-radius: 6px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 150px;
+    display: none;
+}
+
+.dropdown-content a,
+.logout-button {
+    display: block;
+    padding: 10px;
+    text-decoration: none;
+    color: black;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    width: 100%;
+}
+
+/* Ensure hover effect is the same */
+.dropdown-content a:hover,
+.logout-button:hover {
+    background-color: #f8d7da;
+}
+
+
+/* Show menu when populated */
+.dropdown-menu:not(:empty) {
+    display: block;
 }

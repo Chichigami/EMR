@@ -56,8 +56,11 @@ templ DefaultNavbar(date string) {
 	>
 		<input type="date" name="date" value={ date }/>
 	</form>
-	<div hx-boost="true">
-		<a href="/dashboard"><img src="/assets/doctor-svgrepo-com.svg" href="/dashboard" alt="Profile Icon" width="24" height="24"/> </a>
+	<div class="profile-container">
+		<button class="profile-button" hx-get="/user/menu" hx-target="#dropdown-menu" hx-swap="innerHTML">
+			<img src="/assets/doctor-svgrepo-com.svg" class="profile-icon"/>
+		</button>
+		<div id="dropdown-menu" class="dropdown-menu hidden"></div>
 	</div>
 }
 
@@ -72,4 +75,14 @@ templ DefaultFooter() {
 			</p>
 		</h6>
 	</footer>
+}
+
+templ UserMenu() {
+	<div class="dropdown-content" hx-boost="true">
+		<a href="/user/profile">Profile</a>
+		<a href="/user/settings">Settings</a>
+		<form hx-post="/user/logout" hx-trigger="click">
+			<button type="submit" class="logout-button">Logout</button>
+		</form>
+	</div>
 }
