@@ -1,41 +1,38 @@
 # EMR
 
-An electronic medical record web app
+An electronic medical record website
 
 ## Goals
 
-Make a blazingly fast back and front end with Go and Gin
+Make a blazingly fast front and backend with the GoTH stack
+- Learn front end works
+- Learn back end rendering
+- Learn Docker + cloud set up
+- Deploying the website
 
-## Dependancies
+# Dependancies
 
-Gin
+- [Gin](https://gin-gonic.com/)
 
-## Features planned
+- [HTMX](https://htmx.org/)
 
-- Multiple login
-  - Different authorization tiers
-    - Admin
-    - Doctor
-    - Nurse
-    - Technician
-- Dashboard
-  - Blazingly fast patient info look up for present day
-- Patient look up
-  - AI summary of patient
-- Charting
-  - Fast chart loads
-  - ICD10 codes with look up
+- [TEMPL](https://templ.guide/)
 
-## Contributing
+# Current features
+- JWT Auth login
+- Daily interactive dashboard
+- Simple charting (Because charting depends on speciality, I don't have a plan on full support)
+- Front end for front desk
+- Redis caching for fast dashboards
+- PostgreSQL database
 
-### Clone the repo
+# Planned features
+- Better css. (It's ugly at the momment 😦)
+- Refractoring SQL queries
+- Dockerfile
 
-### Build the project
-
-### Run the project
-
-### Run the tests
-
-### Submit a pull request
-
-If you'd like to contribute, please fork the repository and open a pull request to the `main` branch.
+# How to use and deploy EMR yourself
+1. Clone the repository.
+2. Install [Go](https://go.dev/doc/install).
+3. Run `go build`.
+4. Run `./EMR`.
