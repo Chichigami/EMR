@@ -12,8 +12,11 @@ Make a blazingly fast front and backend with the GoTH stack
 
 # Dependancies
 G: [Gin](https://gin-gonic.com/)
+
 o
+
 T: [TEMPL](https://templ.guide/)
+
 H: [HTMX](https://htmx.org/)
 
 # Current features
