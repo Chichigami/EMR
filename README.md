@@ -11,11 +11,10 @@ Make a blazingly fast front and backend with the GoTH stack
 - Deploying the website
 
 # Dependancies
-
-- G: [Gin](https://gin-gonic.com/)
-- o
-- T: [TEMPL](https://templ.guide/)
-- H: [HTMX](https://htmx.org/)
+G: [Gin](https://gin-gonic.com/)
+o
+T: [TEMPL](https://templ.guide/)
+H: [HTMX](https://htmx.org/)
 
 # Current features
 - JWT Auth login
